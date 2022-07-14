@@ -24,19 +24,23 @@ public extension HTMLDecoder {
         return try T(from: self)
     }
     
+    @inlinable
     func _querySelector(_ selector: String) throws -> Element {
         return try querySelector(selector)
             .orThrow(HTMLParseError.cantFindElement(selector: selector))
     }
     
+    @inlinable
     func getElementById(_ id: String) -> Element? {
         return querySelector("#" + id)
     }
     
+    @inlinable
     func getElementsByClassName(_ className: String) -> [Element] {
         return querySelectorAll("." + className)
     }
     
+    @inlinable
     func getElementsByTagName(_ tagName: String) -> [Element] {
         return querySelectorAll(tagName)
     }

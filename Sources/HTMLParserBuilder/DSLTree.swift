@@ -12,7 +12,6 @@ struct DSLTree {
         case capture(selector: String, transform: CaptureTransform? = nil)
         case tryCapture(selector: String, transform: CaptureTransform)
         case captureAll(selector: String, transform: CaptureTransform? = nil)
-        case _captureAll(selector: String, child: Node)
         case local(selector: String, child: Node, transform: CaptureTransform? = nil)
         case root(child: Node, transform: CaptureTransform)
         case empty
@@ -37,8 +36,6 @@ extension DSLTree.Node: CustomStringConvertible {
             return "tryCapture (\"\(selector)\")"
         case .captureAll(let selector, _):
             return "captureAll (\"\(selector)\")"
-        case ._captureAll(let selector, _):
-            return "_captureAll (\"\(selector)\")"
         case .local(let selector, _, _):
             return "local (\"\(selector)\")"
         case .root(_, _):

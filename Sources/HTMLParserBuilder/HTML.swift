@@ -14,7 +14,6 @@ public struct HTML<Output>: HTMLComponent {
     
     public var html: HTML<Output> {
         self
-            .debug()
     }
     
     init(node: DSLTree.Node) {

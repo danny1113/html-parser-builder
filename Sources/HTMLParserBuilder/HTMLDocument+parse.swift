@@ -119,6 +119,7 @@ struct HTMLDecodeFunction {
             } else {
                 result.append(elements)
             }
+        /*
         case ._captureAll(let selector, let child):
             var buffer = [Any]()
             let elements = element.querySelectorAll(selector)
@@ -127,6 +128,7 @@ struct HTMLDecodeFunction {
                 buffer.append(r)
             }
             result = [buffer]
+         */
         case .local(let selector, let child, let transform):
             let e: HTMLElement
             if selector.isEmpty {
