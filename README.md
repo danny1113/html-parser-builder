@@ -53,11 +53,11 @@ Parsing HTML can be complicated, for example you want to parse the simple html b
 Existing HTML parsing library have these downside:
 
 - Name every captured element
-- It can be super complex as the element you want to capture become more and more
+- It can be more complex as the element you want to capture become more and more
 - Error handling can be hard
 
 ```swift
-let htmlString = "..."
+let htmlString = "<html>...</html>"
 let doc = HTMLDocument(string: htmlString)
 let first = doc.querySelector("#hello")?.textContent
 
@@ -85,7 +85,7 @@ HTMLParserBuilder comes with some really great advantages:
 You can construct your parser which reflect your original HTML structure:
 
 ```swift
-let caputure = HTML {
+let capture = HTML {
     TryCapture("#hello") { (element: HTMLElement?) -> String? in
         return element?.textContent
     } // => HTML<String?>
@@ -98,7 +98,7 @@ let caputure = HTML {
 } // => HTML<(String?, String, String)>
 
 
-let htmlString = "..."
+let htmlString = "<html>...</html>"
 let doc = HTMLDocument(string: htmlString)
 
 let output = try doc.parse(capture)
@@ -112,7 +112,7 @@ let output = try doc.parse(capture)
 
 ### HTML
 
-You can construct your parser inside `HTML`, it can also transform to other data types.
+You can construct your parser inside `HTML`, it can also transform to other data type.
 
 ```swift
 struct Group {
@@ -143,7 +143,7 @@ Using `Capture` is the same as `querySelector`, you pass in CSS selector to find
 - attributes
 - ...
 
-> **Note**: If Capture can't find the HTML element that satisify the selector, it will throw an error cause the whole parse fail, for failable capture, see [`TryCapture`](#trycapture).
+> **Note**: If `Capture` can't find the HTML element that match the selector, it will throw an error cause the whole parse fail, for failable capture, see [`TryCapture`](#trycapture).
 
 You can use this API with various declaration that is most suitable for you:
 
@@ -157,7 +157,7 @@ Capture("#hello") { (e: HTMLElement) -> String in
 
 ### TryCapture
 
-`TryCapture` is a litte different from `Capture`, it also call `querySelector` to find the HTML element, but it returns a **optional** HTML element.
+`TryCapture` is a litte different from `Capture`, it also call `querySelector` to find the HTML element, but it returns an **optional** HTML element.
 
 For this example, it will produce the result type of `String?`, and the result will be `nil` when the HTML element can't be found.
 
@@ -169,7 +169,7 @@ TryCapture("#hello") { (e: HTMLElement?) -> String? in
 
 ### CaptureAll
 
-Using `CaptureAll` is the same as `querySelectorAll`, you pass in CSS selector to find all HTML elements that is satisfied the selector, and you can transform it to any other type you want:
+Using `CaptureAll` is the same as `querySelectorAll`, you pass in CSS selector to find all HTML elements that match the selector, and you can transform it to any other type you want:
 
 You can use this API with various declaration that is most suitable for you:
 
@@ -205,9 +205,9 @@ CaptureAll("div.group") { (elements: [HTMLElement]) -> [String] in
 
 ### Local
 
-`Local` will find a HTML element base on the selector, and all the captures inside will find its element based on the element which found by `Local`, this is useful when you just want to capture element that is inside the local group.
+`Local` will find a HTML element that match the selector, and all the captures inside will find its element based on the element found by `Local`, this is useful when you just want to capture element that is inside the local group.
 
-Just like `HTML`, `Local` can also transform captured result to other data types by adding `transform`:
+Just like `HTML`, `Local` can also transform captured result to other data type by adding `transform`:
 
 ```swift
 struct Group {
@@ -226,7 +226,7 @@ Local("#group") {
 } // => Group
 ```
 
-> **Note**: If `Local` can't find the HTML element that satisify the selector, it will throw an error cause the whole parse fail, you can use [`TryCapture`](#trycapture) as alternative.
+> **Note**: If `Local` can't find the HTML element that match the selector, it will throw an error cause the whole parse fail, you can use [`TryCapture`](#trycapture) as alternative.
 
 ### LateInit
 
@@ -249,9 +249,9 @@ let output = doc.parse(container.capture)
 
 | API        | Use Case                                             |
 | ---------- | ---------------------------------------------------- |
-| Capture    | Parse fail when element can't be captured            |
+| Capture    | Throws error when element can't be captured          |
 | TryCapture | Returns `nil` when element can't be captured         |
-| CaptureAll | Capture all elements satisify the selector           |
+| CaptureAll | Capture all elements match the selector              |
 | Local      | Capture elements in the local scope                  |
 | LateInit   | Delay the initialization to first time you access it |
 
@@ -266,31 +266,31 @@ struct Group {
     let h2: String
 }
 
-let groupCapture = HTML {
-    Local("#group") {
-        Capture("h1", transform: \.textContent) // => HTML<String>
-        Capture("h2", transform: \.textContent) // => HTML<String>
-    } // => HTML<(String, String)>
-    
-} transform: { output -> Group in
-    return Group(
-        h1: output.0,
-        h2: output.1
-    )
-} // => HTML<Group>
-
-
-let caputure = HTML {
-    TryCapture("#hello") { (element: HTMLElement?) -> String? in
-        return element?.textContent
-    } // => HTML<String?>
-    
-    groupCapture // => HTML<Group>
+//       |--------------------------------------------------------------|
+let groupCapture = HTML {                                            // |
+    Local("#group") {                                                // |
+        Capture("h1", transform: \.textContent) // => HTML<String>   // |
+        Capture("h2", transform: \.textContent) // => HTML<String>   // |
+    } // => HTML<(String, String)>                                   // |
+                                                                     // |
+} transform: { output -> Group in                                    // |
+    return Group(                                                    // |
+        h1: output.0,                                                // |
+        h2: output.1                                                 // |
+    )                                                                // |
+} // => HTML<Group>                                                  // |
+                                                                     // |
+let capture = HTML {                                                 // |
+    TryCapture("#hello") { (element: HTMLElement?) -> String? in     // |
+        return element?.textContent                                  // |
+    } // => HTML<String?>                                            // |
+                                                                     // |
+    groupCapture // => HTML<Group> -------------------------------------|
     
 } // => HTML<(String?, Group)>
 
 
-let htmlString = "..."
+let htmlString = "<html>...</html>"
 let doc = HTMLDocument(string: htmlString)
 
 let output = try doc.parse(capture)
