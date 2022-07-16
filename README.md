@@ -10,6 +10,7 @@ A result builder that build HTML parser and transform HTML elements to strongly-
     - [Requirement](#requirement)
   - [Introduction](#introduction)
   - [API Detail Usage](#api-detail-usage)
+    - [Parsing](#parsing)
     - [HTML](#html)
     - [Capture](#capture)
     - [TryCapture](#trycapture)
@@ -22,13 +23,14 @@ A result builder that build HTML parser and transform HTML elements to strongly-
 ## Installation
 
 ### Requirement
+
 - Swift 5.7 (`buildPartialBlock`)
 - macOS 10.15
 - iOS 13.0
 - tvOS 13.0
 - watchOS 6.0
 
-> **Note**: HTMLParserBuilder is currently only supports platforms which Objective-C runtime are supported, because it has dependency on [HTMLKit](https://github.com/iabudiab/HTMLKit), an Objective-C HTML parser library.
+> **Note**: HTMLParserBuilder currently only supports platforms where Objective-C runtime are supported, because it has dependency on [HTMLKit](https://github.com/iabudiab/HTMLKit), an Objective-C HTML parser library.
 
 ```swift
 dependencies: [
@@ -80,6 +82,7 @@ HTMLParserBuilder comes with some really great advantages:
 - Strongly-typed capture result
 - Structrued syntax
 - Composible API
+- Support for async await
 - Error handling built in
 
 You can construct your parser which reflect your original HTML structure:
@@ -109,6 +112,17 @@ let output = try doc.parse(capture)
 > **Note**: You can now compose up to 10 components inside the builder, but you can group your captures inside [`Local`](#local) as a workaround.
 
 ## API Detail Usage
+
+### Parsing
+
+HTMLParserBuilder provides 2 functions for parsing:
+
+```swift
+public func parse<Output>(_ html: HTML<Output>) throws -> Output
+public func parse<Output>(_ html: HTML<Output>) async throws -> Output
+```
+
+> **Note**: You can choose the async version for even better performance, since it use structured concurrency to parallelize child tasks.
 
 ### HTML
 
@@ -157,7 +171,7 @@ Capture("#hello") { (e: HTMLElement) -> String in
 
 ### TryCapture
 
-`TryCapture` is a litte different from `Capture`, it also call `querySelector` to find the HTML element, but it returns an **optional** HTML element.
+`TryCapture` is a litte different from `Capture`, it also calls `querySelector` to find the HTML element, but it returns an **optional** HTML element.
 
 For this example, it will produce the result type of `String?`, and the result will be `nil` when the HTML element can't be found.
 
@@ -174,7 +188,7 @@ Using `CaptureAll` is the same as `querySelectorAll`, you pass in CSS selector t
 You can use this API with various declaration that is most suitable for you:
 
 ```swift
-Capture("#hello") { $0.map(\.textContent) }
+CaptureAll("h1") { $0.map(\.textContent) }
 CaptureAll("h1") { (e: [HTMLElement]) -> [String] in
     return e.map(\.textContent)
 }
