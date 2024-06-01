@@ -51,7 +51,7 @@ final class HTMLParserBuilderTests: XCTestCase {
         XCTAssertEqual(output.1, "HELLO, WORLD")
         XCTAssertEqual(output.2, "HELLO, 2")
         XCTAssertEqual(output.3, [group])
-        //XCTAssertEqual(output.4, output.3)
+        XCTAssertEqual(output.4, group)
     }
     
     func testEmptyCapture() throws {
@@ -71,7 +71,6 @@ final class HTMLParserBuilderTests: XCTestCase {
     }
     
     func testDecodeFailure() throws {
-
         let capture = HTML {
             Capture("#hello")
             Capture("div", transform: Group.init)
@@ -90,7 +89,6 @@ final class HTMLParserBuilderTests: XCTestCase {
     }
     
     func testDecodeWithTryCapture() throws {
-
         let capture = HTML {
             Capture("#hello")
             Capture("div", transform: Group.init)
@@ -199,7 +197,6 @@ final class HTMLParserBuilderTests: XCTestCase {
                     return try elements.map { try $0.parse(capture) }
                 }
             } transform: { output -> [Group] in
-                print("output:", output)
                 return output.map(Group.init)
             }
         }
@@ -221,7 +218,7 @@ final class HTMLParserBuilderTests: XCTestCase {
         XCTAssertTrue(type(of: capture) == HTML<((String, Int), (String, i: Int))>.self)
         
         let output = try doc.parse(capture)
-        print(output)
+        XCTAssertTrue(type(of: output) == ((String, Int), (String, i: Int)).self)
         
         
         let capture2 = HTML {
@@ -232,10 +229,9 @@ final class HTMLParserBuilderTests: XCTestCase {
             }
         }
         
-        print(capture2.html.node)
-        
         let output2 = try doc.parse(capture2)
-        print(output2)
+        XCTAssertTrue(type(of: output2) == (String, (String, String)).self)
+        
         
         let capture3 = HTML {
             Local("#group") {
@@ -245,14 +241,7 @@ final class HTMLParserBuilderTests: XCTestCase {
         }
         
         let output3 = try doc.parse(capture3)
-        print(output3)
-    }
-    
-    func testPlusArray() {
-        let a1: [Any] = [0, ["hello"], ["v1", "v2"]]
-        var a2: [Any] = []
-        a2 += a1
-        print(a2)
+        XCTAssertTrue(type(of: output3) == (String, String).self)
     }
     
     func testLateInit() throws {
