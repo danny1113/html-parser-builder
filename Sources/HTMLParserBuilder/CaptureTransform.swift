@@ -10,20 +10,17 @@
 //===----------------------------------------------------------------------===//
 
 
-import HTMLKit
-
-
 struct CaptureTransform: Hashable, CustomStringConvertible {
     
     enum Closure {
         /// A failable transform.
         case failable((Any) throws -> Any?)
         /// Specialized case of `failable` for performance.
-        case HTMLElementFailable((HTMLElement) throws -> Any?)
+        case HTMLElementFailable((any Element) throws -> Any?)
         /// A non-failable transform.
         case nonfailable((Any) throws -> Any)
         /// Specialized case of `failable` for performance.
-        case HTMLElementNonfailable((HTMLElement) throws -> Any?)
+        case HTMLElementNonfailable((any Element) throws -> Any?)
     }
     let argumentType: Any.Type
     let resultType: Any.Type
@@ -40,7 +37,7 @@ struct CaptureTransform: Hashable, CustomStringConvertible {
     ) {
         let closure: Closure
         if let HTMLElementTransform = userSpecifiedTransform
-            as? (HTMLElement) throws -> Result {
+            as? (any Element) throws -> Result {
             closure = .HTMLElementNonfailable(HTMLElementTransform)
         } else {
             closure = .nonfailable {
@@ -58,7 +55,7 @@ struct CaptureTransform: Hashable, CustomStringConvertible {
     ) {
         let closure: Closure
         if let HTMLElementTransform = userSpecifiedTransform
-            as? (HTMLElement) throws -> Result? {
+            as? (any Element) throws -> Result? {
             closure = .HTMLElementFailable(HTMLElementTransform)
         } else {
             closure = .failable {
@@ -80,7 +77,7 @@ struct CaptureTransform: Hashable, CustomStringConvertible {
             assert(type(of: result) == resultType)
             return result
         case .HTMLElementNonfailable(let transform):
-            let result = try transform(input as! HTMLElement)
+            let result = try transform(input as! any Element)
 //            assert(type(of: result) == resultType)
             return result
         case .failable(let transform):
@@ -90,7 +87,7 @@ struct CaptureTransform: Hashable, CustomStringConvertible {
             assert(type(of: result) == resultType)
             return result
         case .HTMLElementFailable(let transform):
-            guard let result = try transform(input as! HTMLElement) else {
+            guard let result = try transform(input as! any Element) else {
                 return nil
             }
             assert(type(of: result) == resultType)
@@ -98,7 +95,7 @@ struct CaptureTransform: Hashable, CustomStringConvertible {
         }
     }
     
-    func callAsFunction(_ input: HTMLElement) throws -> Any? {
+    func callAsFunction(_ input: any Element) throws -> Any? {
         switch closure {
         case .HTMLElementFailable(let transform):
             return try transform(input)

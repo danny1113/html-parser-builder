@@ -5,61 +5,26 @@
 //  Created by Danny Pang on 2022/7/4.
 //
 
-import HTMLKit
-
-
-extension HTMLDocument {
+extension Document {
     public func parse<Output>(_ html: HTML<Output>, debug: Bool = false) throws -> Output {
-        guard let rootElement = rootElement else {
-            throw HTMLParseError.description("can't find rootElement")
-        }
-        
-        let result = try HTMLDecodeFunction()._parse(html.node, element: rootElement, debug ? 0 : nil)
-        
-        //if debug { print("array:", result) }
-        
-        if result.count == 1 {
-            return result[0] as! Output
-        } else {
-            return TypeConstruction.tuple(of: result) as! Output
-        }
+        try rootElement.parse(html, debug: debug)
     }
     
     public func parse<Output>(_ html: HTML<Output>) async throws -> Output {
-        guard let rootElement = rootElement else {
-            throw HTMLParseError.description("can't find rootElement")
-        }
-        
-        let result = try await HTMLDecodeFunction().parseAsync(html.node, element: rootElement)
-        
-        if result.count == 1 {
-            return result[0] as! Output
-        } else {
-            return TypeConstruction.tuple(of: result) as! Output
-        }
+        try await rootElement.parse(html)
     }
     
     public func parse<Component: HTMLComponent>(
         @HTMLComponentBuilder component: () -> Component
     ) throws -> Component.HTMLOutput {
-        guard let rootElement = rootElement else {
-            throw HTMLParseError.description("can't find rootElement")
-        }
-        
         let html = component().html
-        let result = try HTMLDecodeFunction()._parse(html.node, element: rootElement)
-        
-        if result.count == 1 {
-            return result[0] as! Component.HTMLOutput
-        } else {
-            return TypeConstruction.tuple(of: result) as! Component.HTMLOutput
-        }
+        return try parse(html)
     }
 }
 
-extension HTMLElement {
+extension Element {
     public func parse<Output>(_ html: HTML<Output>, debug: Bool = false) throws -> Output {
-        let result = try HTMLDecodeFunction()._parse(html.node, element: self, debug ? 0 : nil)
+        let result = try HTMLDecodeImpl.parse(html.node, element: self, debug ? 0 : nil)
         
         //if debug { print("array:", result) }
         
@@ -71,27 +36,13 @@ extension HTMLElement {
     }
     
     public func parse<Output>(_ html: HTML<Output>) async throws -> Output {
-        let result = try await HTMLDecodeFunction().parseAsync(html.node, element: self)
+        let result = try await HTMLDecodeImpl.parseAsync(html.node, element: self)
         
         if result.count == 1 {
             return result[0] as! Output
         } else {
             return TypeConstruction.tuple(of: result) as! Output
         }
-    }
-}
-
-extension HTMLDocument {
-    public func _querySelector(_ selector: String) throws -> HTMLElement {
-        return try querySelector(selector)
-            .orThrow(HTMLParseError.cantFindElement(selector: selector))
-    }
-}
-
-extension HTMLElement {
-    public func _querySelector(_ selector: String) throws -> HTMLElement {
-        return try querySelector(selector)
-            .orThrow(HTMLParseError.cantFindElement(selector: selector))
     }
 }
 
@@ -100,8 +51,8 @@ public enum HTMLParseError: Error {
     case description(String)
 }
 
-struct HTMLDecodeFunction {
-    func _parse(_ node: DSLTree.Node, element: HTMLElement, _ indent: Int? = nil) throws -> [Any] {
+struct HTMLDecodeImpl {
+    static func parse(_ node: DSLTree.Node, element: any Element, _ indent: Int? = nil) throws -> [Any] {
         var next: Int?
         if let indent {
             print(String(repeating: " ", count: indent), node.description)
@@ -113,11 +64,12 @@ struct HTMLDecodeFunction {
             var buffer = [Any]()
             buffer.reserveCapacity(array.count)
             for node in array {
-                buffer += try _parse(node, element: element, next)
+                buffer += try parse(node, element: element, next)
             }
             return buffer
         case .capture(let selector, let transform):
-            let e = try element._querySelector(selector)
+            let e = try element.querySelector(selector)
+                .orThrow(HTMLParseError.cantFindElement(selector: selector))
             if let transform {
                 if let function = try transform.callAsFunction(e) {
                     return [function]
@@ -132,7 +84,7 @@ struct HTMLDecodeFunction {
             let function = try? transform.callAsFunction(e)
             return [function as Any]
         case .captureAll(let selector, let transform):
-            let elements: [HTMLElement] = element.querySelectorAll(selector)
+            let elements: [any Element] = element.querySelectorAll(selector)
             if let transform {
                 /*
                  var buffer = [Any]()
@@ -158,19 +110,20 @@ struct HTMLDecodeFunction {
             result = [buffer]
          */
         case .local(let selector, let child, let transform):
-            let e: HTMLElement
+            let e: any Element
             if selector.isEmpty {
                 e = element
             } else {
-                e = try element._querySelector(selector)
+                e = try element.querySelector(selector)
+                    .orThrow(HTMLParseError.cantFindElement(selector: selector))
             }
             if let transform {
-                let r: [Any] = try _parse(child, element: e, next)
+                let r: [Any] = try parse(child, element: e, next)
                 let tuple = constructTuple(r)
                 let function = try transform.callAsFunction(tuple) as Any
                 return [function]
             } else {
-                let result = try _parse(child, element: e, next)
+                let result = try parse(child, element: e, next)
                 if result.count == 1 {
                     return [result[0]]
                 } else {
@@ -178,7 +131,7 @@ struct HTMLDecodeFunction {
                 }
             }
         case .root(let child, let transform):
-            let r: [Any] = try _parse(child, element: element, next)
+            let r: [Any] = try parse(child, element: element, next)
             let tuple = constructTuple(r)
             return [try transform.callAsFunction(tuple) as Any]
 //            if r.count == 1 {
@@ -192,7 +145,7 @@ struct HTMLDecodeFunction {
         }
     }
     
-    func parseAsync(_ node: DSLTree.Node, element: HTMLElement) async throws -> [Any] {
+    static func parseAsync(_ node: DSLTree.Node, element: any Element) async throws -> [Any] {
         
         switch node {
         case .concatenation(let array):
@@ -218,7 +171,8 @@ struct HTMLDecodeFunction {
                 return result
             }
         case .capture(let selector, let transform):
-            let e = try element._querySelector(selector)
+            let e = try element.querySelector(selector)
+                .orThrow(HTMLParseError.cantFindElement(selector: selector))
             if let transform {
                 if let function = try transform.callAsFunction(e) {
                     return [function]
@@ -233,7 +187,7 @@ struct HTMLDecodeFunction {
             let function = try? transform.callAsFunction(e)
             return [function as Any]
         case .captureAll(let selector, let transform):
-            let elements: [HTMLElement] = element.querySelectorAll(selector)
+            let elements: [any Element] = element.querySelectorAll(selector)
             if let transform {
                 let function = try transform.callAsFunction(elements) as Any
                 return [function]
@@ -241,11 +195,12 @@ struct HTMLDecodeFunction {
                 return [elements]
             }
         case .local(let selector, let child, let transform):
-            let e: HTMLElement
+            let e: any Element
             if selector.isEmpty {
                 e = element
             } else {
-                e = try element._querySelector(selector)
+                e = try element.querySelector(selector)
+                    .orThrow(HTMLParseError.cantFindElement(selector: selector))
             }
             if let transform {
                 let r: [Any] = try await parseAsync(child, element: e)
@@ -268,7 +223,7 @@ struct HTMLDecodeFunction {
         }
     }
     
-    private func constructTuple(_ x: [Any]) -> Any {
+    private static func constructTuple(_ x: [Any]) -> Any {
         if x.count > 1 {
             return TypeConstruction.tuple(of: x)
         } else {
@@ -276,7 +231,7 @@ struct HTMLDecodeFunction {
         }
     }
     
-    private func traversalTypeConstruct(_ x: Any) -> Any {
+    private static func traversalTypeConstruct(_ x: Any) -> Any {
         guard let x = x as? [[Any]] else {
             if let y = x as? [Any] {
                 return constructTuple(y)

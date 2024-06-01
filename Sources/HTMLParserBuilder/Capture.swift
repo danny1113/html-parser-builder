@@ -5,16 +5,13 @@
 //  Created by Danny Pang on 2022/7/2.
 //
 
-import HTMLKit
-
-
 public struct Capture<Output>: HTMLComponent {
     
     public let html: HTML<Output>
     
     public init(
         _ selector: String,
-        transform: @escaping (HTMLElement) throws -> Output
+        transform: @escaping (any Element) throws -> Output
     ) {
         self.html = .init(node: .capture(
             selector: selector,
@@ -22,7 +19,7 @@ public struct Capture<Output>: HTMLComponent {
         ))
     }
     
-    public init(_ selector: String) where Output == HTMLElement {
+    public init(_ selector: String) where Output == any Element {
         self.html = .init(node: .capture(selector: selector))
     }
 }

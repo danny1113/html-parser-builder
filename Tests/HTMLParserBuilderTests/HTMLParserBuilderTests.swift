@@ -2,6 +2,7 @@ import XCTest
 #if canImport(Combine)
 import Combine
 #endif
+
 @testable import HTMLParserBuilder
 
 
@@ -19,10 +20,10 @@ final class HTMLParserBuilderTests: XCTestCase {
     <h1 class="c1">HELLO, class 2</h1>
     """#
 
-    private var doc: HTMLDocument!
+    private var doc: (any Document)!
 
     override func setUpWithError() throws {
-        doc = HTMLDocument(string: html)
+        doc = try SoupDoc(string: html)
     }
 
     func testParser() throws {
@@ -81,7 +82,7 @@ final class HTMLParserBuilderTests: XCTestCase {
         do {
             let output = try doc.parse(capture)
             print(output)
-            XCTAssertTrue(type(of: output) == (HTMLElement, Group, String).self)
+            XCTAssertTrue(type(of: output) == (any Element, Group, String).self)
             XCTAssertTrue(false, "This test is asserted to be failed")
         } catch {
             print(error)
@@ -99,7 +100,7 @@ final class HTMLParserBuilderTests: XCTestCase {
         
         let output = try doc.parse(capture)
         print(output)
-        XCTAssertTrue(type(of: output) == (HTMLElement, Group, String?).self)
+        XCTAssertTrue(type(of: output) == (any Element, Group, String?).self)
     }
     
     func testIfCase() throws {
@@ -147,7 +148,7 @@ final class HTMLParserBuilderTests: XCTestCase {
             Capture("#hello", transform: \.textContent)
             
             Local("#group") {
-                CaptureAll("div.c1") { (elements: [HTMLElement]) -> [(String, String)] in
+                CaptureAll("div.c1") { (elements: [any Element]) -> [(String, String)] in
                     let capture = HTML {
                         Capture("h1", transform: \.textContent)
                         Capture("h2", transform: \.textContent)
@@ -160,7 +161,7 @@ final class HTMLParserBuilderTests: XCTestCase {
             }
         }
         
-        let doc = HTMLDocument(string: html)
+        let doc = try SoupDoc(string: html)
         let output = try doc.parse(capture)
         print(output)
         XCTAssertTrue(type(of: output) == (String, String, [Group]).self)
@@ -190,7 +191,7 @@ final class HTMLParserBuilderTests: XCTestCase {
             Capture("#hello", transform: \.textContent)
             
             Local("#group") {
-                CaptureAll("div.c1") { (elements: [HTMLElement]) -> [(String, String)] in
+                CaptureAll("div.c1") { (elements: [any Element]) -> [(String, String)] in
                     let capture = HTML {
                         Capture("h1", transform: \.textContent)
                         Capture("h2", transform: \.textContent)
@@ -203,7 +204,7 @@ final class HTMLParserBuilderTests: XCTestCase {
             }
         }
         
-        let doc = HTMLDocument(string: html)
+        let doc = try SoupDoc(string: html)
         let output = try await doc.parse(capture)
         print(output)
     }
@@ -324,7 +325,7 @@ final class HTMLParserBuilderTests: XCTestCase {
 
 
 extension HTMLParserBuilderTests {
-    struct Group: Equatable, HTMLDecodable {
+    struct Group: Equatable {
         let h1: String
         let h2: String
         
@@ -333,7 +334,7 @@ extension HTMLParserBuilderTests {
             self.h2 = output.1
         }
         
-        init(from document: HTMLElement) throws {
+        init(from document: any Element) throws {
             let capture = HTML {
                 Capture("h1", transform: \.textContent)
                 Capture("h2", transform: \.textContent)
