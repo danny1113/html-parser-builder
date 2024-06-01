@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 
-struct CaptureTransform: Hashable, CustomStringConvertible {
+struct CaptureTransform: Sendable, Hashable, CustomStringConvertible {
     
     enum Closure {
         /// A failable transform.

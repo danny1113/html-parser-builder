@@ -5,7 +5,7 @@
 //  Created by Danny Pang on 2022/7/9.
 //
 
-public struct CaptureAll<Output>: HTMLComponent {
+public struct CaptureAll<Output>: Sendable, HTMLComponent {
     
     public let html: HTML<Output>
     

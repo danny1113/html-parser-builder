@@ -5,7 +5,7 @@
 //  Created by Danny Pang on 2022/7/2.
 //
 
-public struct HTML<Output>: HTMLComponent {
+public struct HTML<Output>: Sendable, HTMLComponent {
     
     let node: DSLTree.Node
     

@@ -7,7 +7,7 @@
 
 
 struct DSLTree {
-    indirect enum Node {
+    indirect enum Node: Sendable {
         case concatenation([Node])
         case capture(selector: String, transform: CaptureTransform? = nil)
         case tryCapture(selector: String, transform: CaptureTransform)
