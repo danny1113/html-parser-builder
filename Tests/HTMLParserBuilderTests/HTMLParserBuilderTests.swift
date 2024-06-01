@@ -57,6 +57,7 @@ final class HTMLParserBuilderTests: XCTestCase {
     func testEmptyCapture() throws {
         let capture = HTML {}
         
+        XCTAssertTrue(type(of: capture) == HTML<Void>.self)
         XCTAssertTrue(type(of: try doc.parse(capture)) == Void.self)
     }
     
@@ -77,14 +78,15 @@ final class HTMLParserBuilderTests: XCTestCase {
             // fail
             Capture("#hello1", transform: \.textContent)
         }
+        XCTAssertTrue(type(of: capture) == HTML<(any Element, Group, String)>.self)
 
         do {
-            let output = try doc.parse(capture)
-            print(output)
-            XCTAssertTrue(type(of: output) == (any Element, Group, String).self)
-            XCTAssertTrue(false, "This test is asserted to be failed")
+            let _ = try doc.parse(capture)
+            XCTFail("This test is asserted to be failed")
+        } catch HTMLParseError.cantFindElement(let selector) {
+            XCTAssertEqual(selector, "#hello1")
         } catch {
-            print(error)
+            XCTFail()
         }
     }
     
@@ -103,7 +105,7 @@ final class HTMLParserBuilderTests: XCTestCase {
     
     func testIfCase() throws {
         // capture has to be rebuild when flag change
-        let capture = { (flag: Bool) -> HTML<String> in
+        func capture(_ flag: Bool) -> HTML<String> {
             HTML {
                 if flag {
                     Capture("#hello", transform: \.textContent)
@@ -161,8 +163,13 @@ final class HTMLParserBuilderTests: XCTestCase {
         
         let doc = try SoupDoc(string: html)
         let output = try doc.parse(capture)
-        print(output)
         XCTAssertTrue(type(of: output) == (String, String, [Group]).self)
+        XCTAssertEqual(output.0, "HELLO, 1")
+        XCTAssertEqual(output.1, "HELLO, WORLD")
+        XCTAssertEqual(output.2, [
+            Group(("HELLO, class 1", "HELLO, class 2")),
+            Group(("HELLO, class 3", "HELLO, class 4")),
+        ])
     }
     
     func testLocalTransformAsync() async throws {
