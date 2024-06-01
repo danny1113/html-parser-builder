@@ -9,7 +9,8 @@ A result builder that build HTML parser and transform HTML elements to strongly-
   - [Installation](#installation)
     - [Requirement](#requirement)
   - [Introduction](#introduction)
-  - [API Detail Usage](#api-detail-usage)
+  - [Usage](#api-detail-usage)
+    - [Bring your own parser](#bringyourownparser)
     - [Parsing](#parsing)
     - [HTML](#html)
     - [Capture](#capture)
@@ -24,18 +25,16 @@ A result builder that build HTML parser and transform HTML elements to strongly-
 
 ### Requirement
 
-- Swift 5.7 (`buildPartialBlock`)
+- Swift 5.9
 - macOS 10.15
 - iOS 13.0
 - tvOS 13.0
 - watchOS 6.0
 
-> **Note**: HTMLParserBuilder currently only supports platforms where Objective-C runtime are supported, because it has dependency on [HTMLKit](https://github.com/iabudiab/HTMLKit), an Objective-C HTML parser library.
-
 ```swift
 dependencies: [
     // ...
-    .package(name: "HTMLParserBuilder", url: "https://github.com/danny1113/html-parser-builder.git", from: "1.0.0")
+    .package(name: "HTMLParserBuilder", url: "https://github.com/danny1113/html-parser-builder.git", from: "2.0.0"),
 ]
 ```
 
@@ -60,7 +59,7 @@ Existing HTML parsing library have these downside:
 
 ```swift
 let htmlString = "<html>...</html>"
-let doc = HTMLDocument(string: htmlString)
+let doc: any Document = HTMLDocument(string: htmlString)
 let first = doc.querySelector("#hello")?.textContent
 
 let group = doc.querySelector("#group")
@@ -89,7 +88,7 @@ You can construct your parser which reflect your original HTML structure:
 
 ```swift
 let capture = HTML {
-    TryCapture("#hello") { (element: HTMLElement?) -> String? in
+    TryCapture("#hello") { (element: any Element?) -> String? in
         return element?.textContent
     } // => HTML<String?>
     
@@ -98,20 +97,37 @@ let capture = HTML {
         Capture("h2", transform: \.textContent) // => HTML<String>
     } // => HTML<(String, String)>
     
-} // => HTML<(String?, String, String)>
+} // => HTML<(String?, (String, String))>
 
 
 let htmlString = "<html>...</html>"
-let doc = HTMLDocument(string: htmlString)
+let doc: any Document = HTMLDocument(string: htmlString)
 
 let output = try doc.parse(capture)
-// => (String?, String, String)
-// output: (Optional("hello, world"), "INSIDE GROUP h1", "INSIDE GROUP h2")
+// => (String?, (String, String))
+// output: (Optional("hello, world"), ("INSIDE GROUP h1", "INSIDE GROUP h2"))
 ```
 
 > **Note**: You can now compose up to 10 components inside the builder, but you can group your captures inside [`Local`](#local) as a workaround.
 
-## API Detail Usage
+## Usage
+
+### Bring your own parser
+
+HTMLParserBuilder doesn't rely on any html parser, so you can chose any html parser you want to use, as long as it conforms to the `Document` and `Element` protocol.
+
+For example, you can use SwiftSoup as the html parser, example for conformance to the `Document` and `Element` protocol is available in `Tests/HTMLParserBuilderTests/SwiftSoup+HTMLParserBuilder.swift`.
+
+```swift
+dependencies: [
+    // ...
+    .package(url: "https://github.com/scinfu/SwiftSoup.git", from: "2.6.0"),
+    .package(name: "HTMLParserBuilder", url: "https://github.com/danny1113/html-parser-builder.git", from: "2.0.0"),
+],
+targets: [
+    .target(name: "YourTarget", dependencies: ["SwiftSoup", "HTMLParserBuilder"]),
+]
+```
 
 ### Parsing
 
@@ -164,7 +180,7 @@ You can use this API with various declaration that is most suitable for you:
 ```swift
 Capture("#hello", transform: \.textContent)
 Capture("#hello") { $0.textContent }
-Capture("#hello") { (e: HTMLElement) -> String in
+Capture("#hello") { (e: any Element) -> String in
     return e.textContent
 }
 ```
@@ -176,7 +192,7 @@ Capture("#hello") { (e: HTMLElement) -> String in
 For this example, it will produce the result type of `String?`, and the result will be `nil` when the HTML element can't be found.
 
 ```swift
-TryCapture("#hello") { (e: HTMLElement?) -> String? in
+TryCapture("#hello") { (e: (any Element)?) -> String? in
     return e?.innerHTML
 }
 ```
@@ -189,7 +205,7 @@ You can use this API with various declaration that is most suitable for you:
 
 ```swift
 CaptureAll("h1") { $0.map(\.textContent) }
-CaptureAll("h1") { (e: [HTMLElement]) -> [String] in
+CaptureAll("h1") { (e: [any Element]) -> [String] in
     return e.map(\.textContent)
 }
 ```
@@ -206,7 +222,7 @@ You can also capture other elements inside and transform to other type:
 ```
 
 ```swift
-CaptureAll("div.group") { (elements: [HTMLElement]) -> [String] in
+CaptureAll("div.group") { (elements: [any Element]) -> [String] in
     return elements.compactMap { e in
         return e.querySelector("h1")?.textContent
     }
@@ -295,7 +311,7 @@ let groupCapture = HTML {                                            // |
 } // => HTML<Group>                                                  // |
                                                                      // |
 let capture = HTML {                                                 // |
-    TryCapture("#hello") { (element: HTMLElement?) -> String? in     // |
+    TryCapture("#hello") { (element: (any Element)?) -> String? in     // |
         return element?.textContent                                  // |
     } // => HTML<String?>                                            // |
                                                                      // |
@@ -305,7 +321,7 @@ let capture = HTML {                                                 // |
 
 
 let htmlString = "<html>...</html>"
-let doc = HTMLDocument(string: htmlString)
+let doc: any Document = HTMLDocument(string: htmlString)
 
 let output = try doc.parse(capture)
 // => (String?, Group)
