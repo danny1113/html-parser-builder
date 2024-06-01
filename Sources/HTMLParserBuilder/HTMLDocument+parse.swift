@@ -170,7 +170,12 @@ struct HTMLDecodeFunction {
                 let function = try transform.callAsFunction(tuple) as Any
                 return [function]
             } else {
-                return try _parse(child, element: e, next)
+                let result = try _parse(child, element: e, next)
+                if result.count == 1 {
+                    return [result[0]]
+                } else {
+                    return [TypeConstruction.tuple(of: result)]
+                }
             }
         case .root(let child, let transform):
             let r: [Any] = try _parse(child, element: element, next)
@@ -247,7 +252,12 @@ struct HTMLDecodeFunction {
                 let tuple = constructTuple(r)
                 return [try transform.callAsFunction(tuple) as Any]
             } else {
-                return try await parseAsync(child, element: e)
+                let result = try await parseAsync(child, element: e)
+                if result.count == 1 {
+                    return [result[0]]
+                } else {
+                    return [TypeConstruction.tuple(of: result)]
+                }
             }
         case .root(let child, let transform):
             let r: [Any] = try await parseAsync(child, element: element)

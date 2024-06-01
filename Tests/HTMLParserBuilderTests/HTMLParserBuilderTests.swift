@@ -34,8 +34,8 @@ final class HTMLParserBuilderTests: XCTestCase {
             Local("#group") {
                 Capture("h1", transform: \.textContent)
                 Capture("h2", transform: \.textContent)
-            } transform: { output in
-                Group(output)
+            } transform: { output -> [Group] in
+                [Group(output)]
             }
             
             Capture("#group", transform: Group.init)
@@ -43,13 +43,30 @@ final class HTMLParserBuilderTests: XCTestCase {
 
         let output = try doc.parse(capture)
         print(output)
+        XCTAssertTrue(type(of: output) == (String, String, String, [Group], Group).self)
         
         let group = Group(("Inside group h1", "Inside group h2"))
         XCTAssertEqual(output.0, "HELLO, 1")
         XCTAssertEqual(output.1, "HELLO, WORLD")
         XCTAssertEqual(output.2, "HELLO, 2")
-        XCTAssertEqual(output.3, group)
-        XCTAssertEqual(output.4, output.3)
+        XCTAssertEqual(output.3, [group])
+        //XCTAssertEqual(output.4, output.3)
+    }
+    
+    func testEmptyCapture() throws {
+        let capture = HTML {}
+        
+        XCTAssertTrue(type(of: try doc.parse(capture)) == Void.self)
+    }
+    
+    func testSingleCapture() throws {
+        let capture = HTML {
+            Capture("#hello", transform: \.textContent)
+        }
+        
+        let output = try doc.parse(capture)
+        XCTAssertTrue(type(of: output) == String.self)
+        XCTAssertEqual(output, "HELLO, WORLD")
     }
     
     func testDecodeFailure() throws {
@@ -64,6 +81,7 @@ final class HTMLParserBuilderTests: XCTestCase {
         do {
             let output = try doc.parse(capture)
             print(output)
+            XCTAssertTrue(type(of: output) == (HTMLElement, Group, String).self)
             XCTAssertTrue(false, "This test is asserted to be failed")
         } catch {
             print(error)
@@ -81,6 +99,7 @@ final class HTMLParserBuilderTests: XCTestCase {
         
         let output = try doc.parse(capture)
         print(output)
+        XCTAssertTrue(type(of: output) == (HTMLElement, Group, String?).self)
     }
     
     func testIfCase() throws {
@@ -144,6 +163,7 @@ final class HTMLParserBuilderTests: XCTestCase {
         let doc = HTMLDocument(string: html)
         let output = try doc.parse(capture)
         print(output)
+        XCTAssertTrue(type(of: output) == (String, String, [Group]).self)
     }
     
     func testLocalTransformAsync() async throws {
@@ -186,6 +206,52 @@ final class HTMLParserBuilderTests: XCTestCase {
         let doc = HTMLDocument(string: html)
         let output = try await doc.parse(capture)
         print(output)
+    }
+    
+    func testTypeConstruction() throws {
+        let capture = HTML {
+            Capture("h1") { e -> (String, Int) in
+                return (e.textContent, 1)
+            }
+            Capture("#hello") { e -> (String, i: Int) in
+                return (e.textContent, 2)
+            }
+        }
+        XCTAssertTrue(type(of: capture) == HTML<((String, Int), (String, i: Int))>.self)
+        
+        let output = try doc.parse(capture)
+        print(output)
+        
+        
+        let capture2 = HTML {
+            Capture("h1", transform: \.textContent)
+            Local("#group") {
+                Capture("h1", transform: \.textContent)
+                Capture("h2", transform: \.textContent)
+            }
+        }
+        
+        print(capture2.html.node)
+        
+        let output2 = try doc.parse(capture2)
+        print(output2)
+        
+        let capture3 = HTML {
+            Local("#group") {
+                Capture("h1", transform: \.textContent)
+                Capture("h2", transform: \.textContent)
+            }
+        }
+        
+        let output3 = try doc.parse(capture3)
+        print(output3)
+    }
+    
+    func testPlusArray() {
+        let a1: [Any] = [0, ["hello"], ["v1", "v2"]]
+        var a2: [Any] = []
+        a2 += a1
+        print(a2)
     }
     
     func testLateInit() throws {
@@ -253,7 +319,7 @@ final class HTMLParserBuilderTests: XCTestCase {
         wait(for: [exp], timeout: 1)
     }
 #endif
-    
+
 }
 
 
