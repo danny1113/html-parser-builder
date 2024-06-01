@@ -1,6 +1,6 @@
 //
 //  SwiftSoup+HTMLParserBuilder.swift
-//  
+//
 //
 //  Created by Danny Pang on 2024/6/1.
 //
@@ -14,8 +14,7 @@ import SwiftSoup
 
 
 struct SoupDoc: HTMLParserBuilder.Document {
-    
-    var doc: SwiftSoup.Document
+    private let doc: SwiftSoup.Document
     
     init(doc: SwiftSoup.Document) {
         self.doc = doc
@@ -48,7 +47,7 @@ struct SoupDoc: HTMLParserBuilder.Document {
 }
 
 struct SoupElem: HTMLParserBuilder.Element {
-    var elem: SwiftSoup.Element
+    private let elem: SwiftSoup.Element
     
     init(elem: SwiftSoup.Element) {
         self.elem = elem
