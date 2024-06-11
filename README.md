@@ -311,7 +311,7 @@ let groupCapture = HTML {                                            // |
 } // => HTML<Group>                                                  // |
                                                                      // |
 let capture = HTML {                                                 // |
-    TryCapture("#hello") { (element: (any Element)?) -> String? in     // |
+    TryCapture("#hello") { (element: (any Element)?) -> String? in   // |
         return element?.textContent                                  // |
     } // => HTML<String?>                                            // |
                                                                      // |
