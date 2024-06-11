@@ -46,11 +46,6 @@ extension Element {
     }
 }
 
-public enum HTMLParseError: Error {
-    case cantFindElement(selector: String)
-    case description(String)
-}
-
 struct HTMLDecodeImpl {
     static func parse(_ node: DSLTree.Node, element: any Element, _ indent: Int? = nil) throws -> [Any] {
         var next: Int?
