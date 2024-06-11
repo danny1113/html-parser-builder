@@ -5,6 +5,8 @@
 //  Created by Danny Pang on 2022/7/9.
 //
 
+
+/// Capture all element that matches the CSS selector.
 public struct CaptureAll<Output>: Sendable, HTMLComponent {
     
     public let html: HTML<Output>

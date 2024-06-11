@@ -5,12 +5,15 @@
 //  Created by Danny Pang on 2022/7/2.
 //
 
+
+/// A type that holds the HTML DOM representation.
 public protocol Document {
     associatedtype E: Element
     
     var rootElement: E { get }
 }
 
+/// A type that represents part of a HTML DOM element.
 public protocol Element {
     var textContent: String { get }
     
