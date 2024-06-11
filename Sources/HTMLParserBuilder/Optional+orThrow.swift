@@ -7,7 +7,9 @@
 
 
 extension Optional {
-    public func orThrow(_ errorExpression: @autoclosure () -> Error) throws -> Wrapped {
+    public func orThrow<E: Error>(
+        _ errorExpression: @autoclosure () -> E
+    ) throws -> Wrapped {
         switch self {
         case .some(let value):
             return value

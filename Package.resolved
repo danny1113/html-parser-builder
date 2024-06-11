@@ -1,12 +1,12 @@
 {
   "pins" : [
     {
-      "identity" : "htmlkit",
+      "identity" : "swiftsoup",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/iabudiab/HTMLKit",
+      "location" : "https://github.com/scinfu/SwiftSoup.git",
       "state" : {
-        "revision" : "118cb4197164cc6987f41fae7e1eb21eb96b5f20",
-        "version" : "4.2.0"
+        "revision" : "028487d4a8a291b2fe1b4392b5425b6172056148",
+        "version" : "2.7.2"
       }
     }
   ],

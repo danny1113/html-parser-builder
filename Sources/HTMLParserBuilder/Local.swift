@@ -5,10 +5,18 @@
 //  Created by Danny Pang on 2022/7/9.
 //
 
-import HTMLKit
 
-
-public struct Local<Output>: HTMLComponent {
+/// A local scope that find the first element that matches the CSS selector first, 
+/// than find all the elements inside based on the local scope.
+///
+/// The example below captures the first element with the "h1" tag inside the element with the id "group".
+///
+/// ```swift
+/// Local("#group") {
+///     Capture("h1", transform: \.textContent)
+/// }
+/// ```
+public struct Local<Output>: Sendable, HTMLComponent {
     
     public let html: HTML<Output>
     

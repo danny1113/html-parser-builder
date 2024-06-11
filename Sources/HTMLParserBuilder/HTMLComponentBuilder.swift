@@ -9,8 +9,13 @@
 @resultBuilder
 public enum HTMLComponentBuilder {
     
-    public static func buildBlock<Content: HTMLComponent>(_ component: Content) -> Content {
-        return component
+    public static func buildBlock<each C: HTMLComponent>(
+        _ component: repeat each C
+    ) -> HTML<(repeat (each C).HTMLOutput)> {
+        var nodes: [DSLTree.Node] = []
+        repeat nodes.append((each component).html.node)
+        
+        return HTML(node: .concatenation(nodes))
     }
     
     public static func buildEither<Content: HTMLComponent>(first component: Content) -> Content {
@@ -27,21 +32,5 @@ public enum HTMLComponentBuilder {
         } else {
             return HTML(node: .empty)
         }
-    }
-    
-    public static func buildExpression<Output>(_ expression: Void) -> HTML<Output> {
-        return HTML(node: .empty)
-    }
-    
-    public static func buildExpression<Expression: HTMLComponent>(
-        _ expression: Expression
-    ) -> Expression {
-        return expression
-    }
-    
-    public static func buildPartialBlock<H: HTMLComponent>(
-        first component: H
-    ) -> HTML<H.HTMLOutput> {
-        return component.html
     }
 }
