@@ -7,9 +7,6 @@
 
 import Foundation
 import HTMLParserBuilder
-
-#if canImport(SwiftSoup)
-
 import SwiftSoup
 
 
@@ -150,5 +147,3 @@ struct SoupElem: HTMLParserBuilder.Element {
         return html ?? ""
     }
 }
-
-#endif
