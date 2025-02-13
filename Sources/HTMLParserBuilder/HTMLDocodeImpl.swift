@@ -10,10 +10,6 @@ extension Document {
         try rootElement.parse(html, debug: debug)
     }
     
-    public func parse<Output>(_ html: HTML<Output>) async throws -> Output {
-        try await rootElement.parse(html)
-    }
-    
     public func parse<Component: HTMLComponent>(
         @HTMLComponentBuilder component: () -> Component
     ) throws -> Component.HTMLOutput {
@@ -27,16 +23,6 @@ extension Element {
         let result = try HTMLDecodeImpl.parse(html.node, element: self, debug ? 0 : nil)
         
         //if debug { print("array:", result) }
-        
-        if result.count == 1 {
-            return result[0] as! Output
-        } else {
-            return TypeConstruction.tuple(of: result) as! Output
-        }
-    }
-    
-    public func parse<Output>(_ html: HTML<Output>) async throws -> Output {
-        let result = try await HTMLDecodeImpl.parseAsync(html.node, element: self)
         
         if result.count == 1 {
             return result[0] as! Output
@@ -135,84 +121,6 @@ struct HTMLDecodeImpl {
 //                let tuple = TypeConstruction.tuple(of: r)
 //                result = [try transform.callAsFunction(tuple) as Any]
 //            }
-        case .empty:
-            return []
-        }
-    }
-    
-    static func parseAsync(_ node: DSLTree.Node, element: any Element) async throws -> [Any] {
-        
-        switch node {
-        case .concatenation(let array):
-            return try await withThrowingTaskGroup(of: (Int, [Any]).self) { (group) -> [Any] in
-                var result = [Any]()
-                var orderTable = [Int: [Any]]()
-                let count = array.count
-                result.reserveCapacity(count)
-                orderTable.reserveCapacity(count)
-                
-                for (i, node) in array.enumerated() {
-                    group.addTask {
-                        let result = try await parseAsync(node, element: element)
-                        return (i, result)
-                    }
-                }
-                for try await node in group {
-                    orderTable[node.0] = node.1
-                }
-                for key in 0..<count {
-                    result += orderTable[key]!
-                }
-                return result
-            }
-        case .capture(let selector, let transform):
-            let e = try element.querySelector(selector)
-                .orThrow(HTMLParseError.cantFindElement(selector: selector))
-            if let transform {
-                if let function = try transform.callAsFunction(e) {
-                    return [function]
-                } else {
-                    return []
-                }
-            } else {
-                return [e]
-            }
-        case .tryCapture(let selector, let transform):
-            let e = element.querySelector(selector)
-            let function = try? transform.callAsFunction(e)
-            return [function as Any]
-        case .captureAll(let selector, let transform):
-            let elements: [any Element] = element.querySelectorAll(selector)
-            if let transform {
-                let function = try transform.callAsFunction(elements) as Any
-                return [function]
-            } else {
-                return [elements]
-            }
-        case .local(let selector, let child, let transform):
-            let e: any Element
-            if selector.isEmpty {
-                e = element
-            } else {
-                e = try element.querySelector(selector)
-                    .orThrow(HTMLParseError.cantFindElement(selector: selector))
-            }
-            if let transform {
-                let r: [Any] = try await parseAsync(child, element: e)
-                let tuple = constructTuple(r)
-                return [try transform.callAsFunction(tuple) as Any]
-            } else {
-                let result = try await parseAsync(child, element: e)
-                if result.count == 1 {
-                    return [result[0]]
-                } else {
-                    return [TypeConstruction.tuple(of: result)]
-                }
-            }
-        case .root(let child, let transform):
-            let r: [Any] = try await parseAsync(child, element: element)
-            let tuple = constructTuple(r)
-            return [try transform.callAsFunction(tuple) as Any]
         case .empty:
             return []
         }

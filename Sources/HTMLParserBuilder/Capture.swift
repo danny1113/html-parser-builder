@@ -28,7 +28,7 @@ public struct Capture<Output>: Sendable, HTMLComponent {
     
     public init(
         _ selector: String,
-        transform: @escaping (any Element) throws -> Output
+        transform: @Sendable @escaping (any Element) throws -> Output
     ) {
         self.html = .init(node: .capture(
             selector: selector,

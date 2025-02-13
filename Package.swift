@@ -31,11 +31,14 @@ let package = Package(
             dependencies: [],
             swiftSettings: [
                 .enableUpcomingFeature("ExistentialAny"),
+                .enableUpcomingFeature("MemberImportVisibility"),
+                .enableUpcomingFeature("InternalImportsByDefault"),
             ]
         ),
         .testTarget(
             name: "HTMLParserBuilderTests",
             dependencies: ["SwiftSoup", "HTMLParserBuilder"]
         ),
-    ]
+    ],
+    swiftLanguageVersions: [.version("6"), .v5]
 )

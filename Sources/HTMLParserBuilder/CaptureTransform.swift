@@ -12,15 +12,15 @@
 
 struct CaptureTransform: Sendable, Hashable, CustomStringConvertible {
     
-    enum Closure {
+    enum Closure: Sendable {
         /// A failable transform.
-        case failable((Any) throws -> Any?)
+        case failable(@Sendable (Any) throws -> Any?)
         /// Specialized case of `failable` for performance.
-        case HTMLElementFailable((any Element) throws -> Any?)
+        case HTMLElementFailable(@Sendable (any Element) throws -> Any?)
         /// A non-failable transform.
-        case nonfailable((Any) throws -> Any)
+        case nonfailable(@Sendable (Any) throws -> Any)
         /// Specialized case of `failable` for performance.
-        case HTMLElementNonfailable((any Element) throws -> Any?)
+        case HTMLElementNonfailable(@Sendable (any Element) throws -> Any?)
     }
     let argumentType: Any.Type
     let resultType: Any.Type
@@ -33,11 +33,11 @@ struct CaptureTransform: Sendable, Hashable, CustomStringConvertible {
     }
     
     init<Argument, Result>(
-        _ userSpecifiedTransform: @escaping (Argument) throws -> Result
+        _ userSpecifiedTransform: @Sendable @escaping (Argument) throws -> Result
     ) {
         let closure: Closure
         if let HTMLElementTransform = userSpecifiedTransform
-            as? (any Element) throws -> Result {
+            as? @Sendable (any Element) throws -> Result {
             closure = .HTMLElementNonfailable(HTMLElementTransform)
         } else {
             closure = .nonfailable {
@@ -51,11 +51,11 @@ struct CaptureTransform: Sendable, Hashable, CustomStringConvertible {
     }
     
     init<Argument, Result>(
-        _ userSpecifiedTransform: @escaping (Argument) throws -> Result?
+        _ userSpecifiedTransform: @Sendable @escaping (Argument) throws -> Result?
     ) {
         let closure: Closure
         if let HTMLElementTransform = userSpecifiedTransform
-            as? (any Element) throws -> Result? {
+            as? @Sendable (any Element) throws -> Result? {
             closure = .HTMLElementFailable(HTMLElementTransform)
         } else {
             closure = .failable {

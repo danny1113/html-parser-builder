@@ -81,7 +81,6 @@ HTMLParserBuilder comes with some really great advantages:
 - Strongly-typed capture result
 - Structrued syntax
 - Composible API
-- Support for async await
 - Error handling built in
 
 You can construct your parser which reflect your original HTML structure:
@@ -131,14 +130,11 @@ targets: [
 
 ### Parsing
 
-HTMLParserBuilder provides 2 functions for parsing:
+HTMLParserBuilder provides a function for parsing:
 
 ```swift
 public func parse<Output>(_ html: HTML<Output>) throws -> Output
-public func parse<Output>(_ html: HTML<Output>) async throws -> Output
 ```
-
-> **Note**: You can choose the async version for even better performance, since it use structured concurrency to parallelize child tasks.
 
 ### HTML
 

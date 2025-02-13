@@ -40,7 +40,7 @@ public struct Local<Output>: Sendable, HTMLComponent {
     public init<Component: HTMLComponent>(
         _ selector: String = "",
         @HTMLComponentBuilder _ component: () -> Component,
-        transform: @escaping (Component.HTMLOutput) -> Output
+        transform: @Sendable @escaping (Component.HTMLOutput) -> Output
     ) {
         self.html = .init(node: .local(
             selector: selector,

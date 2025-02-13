@@ -25,7 +25,7 @@ public struct HTML<Output>: Sendable, HTMLComponent {
     
     public init<Component: HTMLComponent>(
         @HTMLComponentBuilder _ component: () -> Component,
-        transform: @escaping (Component.HTMLOutput) throws -> Output
+        transform: @Sendable @escaping (Component.HTMLOutput) throws -> Output
     ) {
         let html = component().html
         self.node = .root(

@@ -11,7 +11,10 @@ public struct CaptureAll<Output>: Sendable, HTMLComponent {
     
     public let html: HTML<Output>
     
-    public init(_ selector: String, transform: @escaping ([any Element]) throws -> Output) {
+    public init(
+        _ selector: String,
+        transform: @Sendable @escaping ([any Element]) throws -> Output
+    ) {
         self.html = .init(node: .captureAll(
             selector: selector,
             transform: CaptureTransform(transform)
