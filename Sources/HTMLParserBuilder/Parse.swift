@@ -6,9 +6,10 @@
 //
 
 extension Document {
-    public func parse<Output>(_ html: HTML<Output>, debug: Bool = false) throws
-        -> Output
-    {
+    public func parse<Output>(
+        _ html: HTML<Output>,
+        debug: Bool = false
+    ) throws -> Output {
         try rootElement.parse(html, debug: debug)
     }
 
@@ -21,13 +22,12 @@ extension Document {
 }
 
 extension Element {
-    public func parse<Output>(_ html: HTML<Output>, debug: Bool = false) throws
-        -> Output
-    {
+    public func parse<Output>(
+        _ html: HTML<Output>,
+        debug: Bool = false
+    ) throws -> Output {
         let result = try HTMLDecodeImpl.parse(
             html.node, element: self, debug ? 0 : nil)
-
-        //if debug { print("array:", result) }
 
         if result.count == 1 {
             return result[0] as! Output

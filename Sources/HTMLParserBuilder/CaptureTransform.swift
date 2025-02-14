@@ -81,7 +81,7 @@ struct CaptureTransform: Sendable, Hashable, CustomStringConvertible {
             return result
         case .htmlElementNonfailable(let transform):
             let result = try transform(input as! any Element)
-            //            assert(type(of: result) == resultType)
+            // assert(type(of: result) == resultType)
             return result
         case .failable(let transform):
             guard let result = try transform(input) else {
