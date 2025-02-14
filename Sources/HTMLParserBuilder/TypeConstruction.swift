@@ -19,7 +19,7 @@
 //                              const ValueWitnessTable *proposedWitnesses);
 
 @_silgen_name("swift_getTupleTypeMetadata")
-private func swift_getTupleTypeMetadata(
+private func getTupleTypeMetadata(
     request: Int,
     flags: Int,
     elements: UnsafePointer<Any.Type>?,
@@ -67,7 +67,7 @@ public enum TypeConstruction {
             elementTypesBuffer in
             if let labels = labels {
                 return labels.withCString { labelsPtr in
-                    swift_getTupleTypeMetadata(
+                    getTupleTypeMetadata(
                         request: 0,
                         flags: flags,
                         elements: elementTypesBuffer.baseAddress,
@@ -76,7 +76,7 @@ public enum TypeConstruction {
                     )
                 }
             } else {
-                return swift_getTupleTypeMetadata(
+                return getTupleTypeMetadata(
                     request: 0,
                     flags: flags,
                     elements: elementTypesBuffer.baseAddress,

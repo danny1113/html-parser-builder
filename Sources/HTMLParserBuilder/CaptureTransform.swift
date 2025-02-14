@@ -15,11 +15,11 @@ struct CaptureTransform: Sendable, Hashable, CustomStringConvertible {
         /// A failable transform.
         case failable(@Sendable (Any) throws -> Any?)
         /// Specialized case of `failable` for performance.
-        case HTMLElementFailable(@Sendable (any Element) throws -> Any?)
+        case htmlElementFailable(@Sendable (any Element) throws -> Any?)
         /// A non-failable transform.
         case nonfailable(@Sendable (Any) throws -> Any)
         /// Specialized case of `failable` for performance.
-        case HTMLElementNonfailable(@Sendable (any Element) throws -> Any?)
+        case htmlElementNonfailable(@Sendable (any Element) throws -> Any?)
     }
     let argumentType: Any.Type
     let resultType: Any.Type
@@ -36,10 +36,10 @@ struct CaptureTransform: Sendable, Hashable, CustomStringConvertible {
             Result
     ) {
         let closure: Closure
-        if let HTMLElementTransform = userSpecifiedTransform
+        if let htmlElementTransform = userSpecifiedTransform
             as? @Sendable (any Element) throws -> Result
         {
-            closure = .HTMLElementNonfailable(HTMLElementTransform)
+            closure = .htmlElementNonfailable(htmlElementTransform)
         } else {
             closure = .nonfailable {
                 try userSpecifiedTransform($0 as! Argument) as Any
@@ -56,10 +56,10 @@ struct CaptureTransform: Sendable, Hashable, CustomStringConvertible {
             Result?
     ) {
         let closure: Closure
-        if let HTMLElementTransform = userSpecifiedTransform
+        if let htmlElementTransform = userSpecifiedTransform
             as? @Sendable (any Element) throws -> Result?
         {
-            closure = .HTMLElementFailable(HTMLElementTransform)
+            closure = .htmlElementFailable(htmlElementTransform)
         } else {
             closure = .failable {
                 try userSpecifiedTransform($0 as! Argument) as Any?
@@ -79,7 +79,7 @@ struct CaptureTransform: Sendable, Hashable, CustomStringConvertible {
             let result = try transform(input)
             assert(type(of: result) == resultType)
             return result
-        case .HTMLElementNonfailable(let transform):
+        case .htmlElementNonfailable(let transform):
             let result = try transform(input as! any Element)
             //            assert(type(of: result) == resultType)
             return result
@@ -89,7 +89,7 @@ struct CaptureTransform: Sendable, Hashable, CustomStringConvertible {
             }
             assert(type(of: result) == resultType)
             return result
-        case .HTMLElementFailable(let transform):
+        case .htmlElementFailable(let transform):
             guard let result = try transform(input as! any Element) else {
                 return nil
             }
@@ -100,9 +100,9 @@ struct CaptureTransform: Sendable, Hashable, CustomStringConvertible {
 
     func callAsFunction(_ input: any Element) throws -> Any? {
         switch closure {
-        case .HTMLElementFailable(let transform):
+        case .htmlElementFailable(let transform):
             return try transform(input)
-        case .HTMLElementNonfailable(let transform):
+        case .htmlElementNonfailable(let transform):
             return try transform(input)
         case .failable(let transform):
             return try transform(input)
