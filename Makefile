@@ -1,4 +1,4 @@
-.PHONY: build test format
+.PHONY: build test format lint
 
 build:
 	swift build
@@ -10,6 +10,13 @@ format:
 	swift format \
 		--in-place --parallel --recursive \
 		--configuration .swift-format \
+		.
+
+lint:
+	swift format lint \
+		--parallel --recursive \
+		--configuration .swift-format \
+		--no-color-diagnostics \
 		.
 
 clean:
