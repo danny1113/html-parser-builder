@@ -5,6 +5,30 @@
 //  Created by Danny Pang on 2022/7/2.
 //
 
+/// Top level building block for creating a parser builder.
+///
+/// The example below shows how to build a html parser:
+///
+/// ```swift
+/// let capture: HTML<(String?, (String, String))> = HTML {
+///     ZeroOrOne("#hello") { (element: any Element?) -> String? in
+///         return element?.textContent
+///     } // => HTML<String?>
+///
+///     Group("#group") {
+///         One("h1", transform: \.textContent)
+///         One("h2", transform: \.textContent)
+///     } // => HTML<(String, String)>
+/// }
+///
+/// let htmlString = "<html>...</html>"
+/// let doc: any Document = HTMLDocument(string: htmlString)
+///
+/// let output: (String?, (String, String)) = try doc.parse(capture)
+/// ```
+///
+/// For more information about other building blocks to build a html parser,
+/// see ``One``, ``ZeroOrOne``, ``Group``.
 public struct HTML<Output>: Sendable, HTMLComponent {
 
     let node: DSLTree.Node
