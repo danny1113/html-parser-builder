@@ -141,7 +141,7 @@ public func parse<Output>(_ html: HTML<Output>) throws -> Output
 You can construct your parser inside `HTML`, it can also transform to other data type.
 
 ```swift
-struct Group {
+struct Pair {
     let h1: String
     let h2: String
 }
@@ -150,12 +150,12 @@ let capture = HTML {
     One("#group h1", transform: \.textContent) // => HTML<String>
     One("#group h2", transform: \.textContent) // => HTML<String>
     
-} transform: { (output: (String, String)) -> Group in
-    return Group(
+} transform: { (output: (String, String)) -> Pair in
+    return Pair(
         h1: output.0,
         h2: output.1
     )
-} // => HTML<Group>
+} // => HTML<Pair>
 ```
 
 ---
@@ -236,7 +236,7 @@ Many("div.group") { (elements: [any Element]) -> [String] in
 Just like `HTML`, `Group` can also transform captured result to other data type by adding `transform`:
 
 ```swift
-struct Group {
+struct Pair {
     let h1: String
     let h2: String
 }
@@ -244,12 +244,12 @@ struct Group {
 Group("#group") {
     One("h1", transform: \.textContent) // => HTML<String>
     One("h2", transform: \.textContent) // => HTML<String>
-} transform: { (output: (String, String)) -> Group in
-    return Group(
+} transform: { (output: (String, String)) -> Pair in
+    return Pair(
         h1: output.0,
         h2: output.1
     )
-} // => Group
+} // => Pair
 ```
 
 > **Note**: If `Group` can't find the HTML element that match the selector, it will throw an error cause the whole parse fail, you can use [`ZeroOrOne`](#zeroorone) as alternative.
@@ -287,7 +287,7 @@ let output = doc.parse(container.capture)
 - Transform to custom data structure before parasing
 
 ```swift
-struct Group {
+struct Pair {
     let h1: String
     let h2: String
 }
@@ -299,26 +299,25 @@ let groupCapture = HTML {                                            // |
         One("h2", transform: \.textContent) // => HTML<String>       // |
     } // => HTML<(String, String)>                                   // |
                                                                      // |
-} transform: { output -> Group in                                    // |
-    return Group(                                                    // |
+} transform: { output -> Pair in                                     // |
+    return Pair(                                                     // |
         h1: output.0,                                                // |
         h2: output.1                                                 // |
     )                                                                // |
-} // => HTML<Group>                                                  // |
+} // => HTML<Pair>                                                   // |
                                                                      // |
 let capture = HTML {                                                 // |
     ZeroOrOne("#hello") { (element: (any Element)?) -> String? in    // |
         return element?.textContent                                  // |
     } // => HTML<String?>                                            // |
                                                                      // |
-    groupCapture // => HTML<Group> -------------------------------------|
-    
-} // => HTML<(String?, Group)>
+    groupCapture // => HTML<Pair>  -------------------------------------|
+
+} // => HTML<(String?, Pair)>
 
 
 let htmlString = "<html>...</html>"
 let doc: any Document = HTMLDocument(string: htmlString)
 
-let output = try doc.parse(capture)
-// => (String?, Group)
+let output: (String?, Pair) = try doc.parse(capture)
 ```
