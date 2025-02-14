@@ -91,12 +91,12 @@ struct HTMLParserBuilderTests {
     }
 
     @Test
-    func testDecodeWithTryCapture() throws {
+    func testDecodeWithZeroOrOne() throws {
         let capture = HTML {
             Capture("#hello")
             Capture("div", transform: Group.init)
             // returns nil
-            TryCapture("#hello1", transform: \.?.textContent)
+            ZeroOrOne("#hello1", transform: \.?.textContent)
         }
 
         let output = try doc.parse(capture)

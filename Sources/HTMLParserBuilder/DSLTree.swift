@@ -9,7 +9,7 @@ struct DSLTree {
     indirect enum Node: Sendable {
         case concatenation([Node])
         case capture(selector: String, transform: CaptureTransform? = nil)
-        case tryCapture(selector: String, transform: CaptureTransform)
+        case zeroOrOne(selector: String, transform: CaptureTransform)
         case captureAll(selector: String, transform: CaptureTransform? = nil)
         case local(
             selector: String, child: Node, transform: CaptureTransform? = nil)
@@ -25,8 +25,8 @@ extension DSLTree.Node: CustomStringConvertible {
             return "concatenation \(array)"
         case .capture(let selector, _):
             return "capture (\"\(selector)\")"
-        case .tryCapture(let selector, _):
-            return "tryCapture (\"\(selector)\")"
+        case .zeroOrOne(let selector, _):
+            return "zeroOrOne (\"\(selector)\")"
         case .captureAll(let selector, _):
             return "captureAll (\"\(selector)\")"
         case .local(let selector, let node, _):

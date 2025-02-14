@@ -14,7 +14,7 @@ A result builder that build HTML parser and transform HTML elements to strongly-
     - [Parsing](#parsing)
     - [HTML](#html)
     - [Capture](#capture)
-    - [TryCapture](#trycapture)
+    - [ZeroOrOne](#zeroorone)
     - [CaptureAll](#captureall)
     - [Local](#local)
     - [LateInit](#lateinit)
@@ -87,7 +87,7 @@ You can construct your parser which reflect your original HTML structure:
 
 ```swift
 let capture = HTML {
-    TryCapture("#hello") { (element: any Element?) -> String? in
+    ZeroOrOne("#hello") { (element: any Element?) -> String? in
         return element?.textContent
     } // => HTML<String?>
     
@@ -169,7 +169,7 @@ Using `Capture` is the same as `querySelector`, you pass in CSS selector to find
 - attributes
 - ...
 
-> **Note**: If `Capture` can't find the HTML element that match the selector, it will throw an error cause the whole parse fail, for failable capture, see [`TryCapture`](#trycapture).
+> **Note**: If `Capture` can't find the HTML element that match the selector, it will throw an error cause the whole parse fail, for failable capture, see [`ZeroOrOne`](#zeroorone).
 
 You can use this API with various declaration that is most suitable for you:
 
@@ -181,14 +181,14 @@ Capture("#hello") { (e: any Element) -> String in
 }
 ```
 
-### TryCapture
+### ZeroOrOne
 
-`TryCapture` is a litte different from `Capture`, it also calls `querySelector` to find the HTML element, but it returns an **optional** HTML element.
+`ZeroOrOne` is a litte different from `Capture`, it also calls `querySelector` to find the HTML element, but it returns an **optional** HTML element.
 
 For this example, it will produce the result type of `String?`, and the result will be `nil` when the HTML element can't be found.
 
 ```swift
-TryCapture("#hello") { (e: (any Element)?) -> String? in
+ZeroOrOne("#hello") { (e: (any Element)?) -> String? in
     return e?.innerHTML
 }
 ```
@@ -252,7 +252,7 @@ Local("#group") {
 } // => Group
 ```
 
-> **Note**: If `Local` can't find the HTML element that match the selector, it will throw an error cause the whole parse fail, you can use [`TryCapture`](#trycapture) as alternative.
+> **Note**: If `Local` can't find the HTML element that match the selector, it will throw an error cause the whole parse fail, you can use [`ZeroOrOne`](#zeroorone) as alternative.
 
 ### LateInit
 
@@ -276,7 +276,7 @@ let output = doc.parse(container.capture)
 | API        | Use Case                                             |
 | ---------- | ---------------------------------------------------- |
 | Capture    | Throws error when element can't be captured          |
-| TryCapture | Returns `nil` when element can't be captured         |
+| ZeroOrOne  | Returns `nil` when element can't be captured         |
 | CaptureAll | Capture all elements match the selector              |
 | Local      | Capture elements in the local scope                  |
 | LateInit   | Delay the initialization to first time you access it |
@@ -307,7 +307,7 @@ let groupCapture = HTML {                                            // |
 } // => HTML<Group>                                                  // |
                                                                      // |
 let capture = HTML {                                                 // |
-    TryCapture("#hello") { (element: (any Element)?) -> String? in   // |
+    ZeroOrOne("#hello") { (element: (any Element)?) -> String? in    // |
         return element?.textContent                                  // |
     } // => HTML<String?>                                            // |
                                                                      // |

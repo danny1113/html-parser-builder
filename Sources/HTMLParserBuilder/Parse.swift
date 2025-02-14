@@ -67,7 +67,7 @@ struct HTMLDecodeImpl {
             } else {
                 return [e]
             }
-        case .tryCapture(let selector, let transform):
+        case .zeroOrOne(let selector, let transform):
             let e = element.querySelector(selector)
             let function = try? transform.callAsFunction(e)
             return [function as Any]

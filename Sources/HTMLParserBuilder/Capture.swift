@@ -7,7 +7,7 @@
 
 /// Capture the first element that matches the CSS selector.
 ///
-/// This will throws an error if no element match the CSS selector, if you want to returns an optional element, see ``TryCapture``.
+/// This will throws an error if no element match the CSS selector, if you want to returns an optional element, see ``ZeroOrOne``.
 ///
 /// To returns a first element that matches the selector #selector:
 /// ```swift

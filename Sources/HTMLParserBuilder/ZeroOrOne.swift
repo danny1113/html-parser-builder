@@ -1,5 +1,5 @@
 //
-//  TryCapture.swift
+//  ZeroOrOne.swift
 //
 //
 //  Created by Danny Pang on 2022/7/9.
@@ -11,17 +11,17 @@
 ///
 /// To returns a first element that matches the selector #selector:
 /// ```swift
-/// TryCapture("#selector")
+/// ZeroOrOne("#selector")
 /// ```
 ///
 /// You can also get properties from an element by provide a transform closure:
 /// ```swift
-/// TryCapture("#selector", transform: \.?.textContent)
-/// TryCapture("#selector") { (e: (any Element)?) -> String? in
+/// ZeroOrOne("#selector", transform: \.?.textContent)
+/// ZeroOrOne("#selector") { (e: (any Element)?) -> String? in
 ///     return e?.textContent
 /// }
 /// ```
-public struct TryCapture<Output>: Sendable, HTMLComponent {
+public struct ZeroOrOne<Output>: Sendable, HTMLComponent {
 
     public let html: HTML<Output>
 
@@ -30,7 +30,7 @@ public struct TryCapture<Output>: Sendable, HTMLComponent {
         transform: @Sendable @escaping ((any Element)?) throws -> Output
     ) {
         self.html = .init(
-            node: .tryCapture(
+            node: .zeroOrOne(
                 selector: selector,
                 transform: CaptureTransform(transform)
             ))
