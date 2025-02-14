@@ -1,6 +1,8 @@
 .PHONY: build test format lint
 
-build:
+all: build
+
+build: format lint
 	swift build
 
 test:
