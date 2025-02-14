@@ -12,7 +12,7 @@
 ///
 /// ```swift
 /// Group("#group") {
-///     Capture("h1", transform: \.textContent)
+///     One("h1", transform: \.textContent)
 /// }
 /// ```
 public struct Group<Output>: Sendable, HTMLComponent {

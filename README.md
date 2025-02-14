@@ -13,7 +13,7 @@ A result builder that build HTML parser and transform HTML elements to strongly-
     - [Bring your own parser](#bringyourownparser)
     - [Parsing](#parsing)
     - [HTML](#html)
-    - [Capture](#capture)
+    - [One](#one)
     - [ZeroOrOne](#zeroorone)
     - [Many](#many)
     - [Group](#group)
@@ -92,8 +92,8 @@ let capture = HTML {
     } // => HTML<String?>
     
     Group("#group") {
-        Capture("h1", transform: \.textContent) // => HTML<String>
-        Capture("h2", transform: \.textContent) // => HTML<String>
+        One("h1", transform: \.textContent) // => HTML<String>
+        One("h2", transform: \.textContent) // => HTML<String>
     } // => HTML<(String, String)>
     
 } // => HTML<(String?, (String, String))>
@@ -147,8 +147,8 @@ struct Group {
 }
 
 let capture = HTML {
-    Capture("#group h1", transform: \.textContent) // => HTML<String>
-    Capture("#group h2", transform: \.textContent) // => HTML<String>
+    One("#group h1", transform: \.textContent) // => HTML<String>
+    One("#group h2", transform: \.textContent) // => HTML<String>
     
 } transform: { (output: (String, String)) -> Group in
     return Group(
@@ -160,30 +160,30 @@ let capture = HTML {
 
 ---
 
-### Capture
+### One
 
-Using `Capture` is the same as `querySelector`, you pass in CSS selector to find the HTML element, and you can transform it to any other type you want:
+Using `One` is the same as `querySelector`, you pass in CSS selector to find the HTML element, and you can transform it to any other type you want:
 
 - innerHTML
 - textContent
 - attributes
 - ...
 
-> **Note**: If `Capture` can't find the HTML element that match the selector, it will throw an error cause the whole parse fail, for failable capture, see [`ZeroOrOne`](#zeroorone).
+> **Note**: If `One` can't find the HTML element that match the selector, it will throw an error cause the whole parse fail, for failable capture, see [`ZeroOrOne`](#zeroorone).
 
 You can use this API with various declaration that is most suitable for you:
 
 ```swift
-Capture("#hello", transform: \.textContent)
-Capture("#hello") { $0.textContent }
-Capture("#hello") { (e: any Element) -> String in
+One("#hello", transform: \.textContent)
+One("#hello") { $0.textContent }
+One("#hello") { (e: any Element) -> String in
     return e.textContent
 }
 ```
 
 ### ZeroOrOne
 
-`ZeroOrOne` is a litte different from `Capture`, it also calls `querySelector` to find the HTML element, but it returns an **optional** HTML element.
+`ZeroOrOne` is a litte different from `One`, it also calls `querySelector` to find the HTML element, but it returns an **optional** HTML element.
 
 For this example, it will produce the result type of `String?`, and the result will be `nil` when the HTML element can't be found.
 
@@ -242,8 +242,8 @@ struct Group {
 }
 
 Group("#group") {
-    Capture("h1", transform: \.textContent) // => HTML<String>
-    Capture("h2", transform: \.textContent) // => HTML<String>
+    One("h1", transform: \.textContent) // => HTML<String>
+    One("h2", transform: \.textContent) // => HTML<String>
 } transform: { (output: (String, String)) -> Group in
     return Group(
         h1: output.0,
@@ -261,7 +261,7 @@ This library also comes with a handy property wrapper: `LateInit`, which can del
 ```swift
 struct Container {
     @LateInit var capture = HTML {
-        Capture("h1", transform: \.textContent)
+        One("h1", transform: \.textContent)
     }
 }
 
@@ -275,7 +275,7 @@ let output = doc.parse(container.capture)
 
 | API        | Use Case                                             |
 | ---------- | ---------------------------------------------------- |
-| Capture    | Throws error when element can't be captured          |
+| One        | Throws error when element can't be captured          |
 | ZeroOrOne  | Returns `nil` when element can't be captured         |
 | Many       | Capture all elements match the selector              |
 | Group      | Capture elements in the local scope                  |
@@ -295,8 +295,8 @@ struct Group {
 //       |--------------------------------------------------------------|
 let groupCapture = HTML {                                            // |
     Group("#group") {                                                // |
-        Capture("h1", transform: \.textContent) // => HTML<String>   // |
-        Capture("h2", transform: \.textContent) // => HTML<String>   // |
+        One("h1", transform: \.textContent) // => HTML<String>       // |
+        One("h2", transform: \.textContent) // => HTML<String>       // |
     } // => HTML<(String, String)>                                   // |
                                                                      // |
 } transform: { output -> Group in                                    // |

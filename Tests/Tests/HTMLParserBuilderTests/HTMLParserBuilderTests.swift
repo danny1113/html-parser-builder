@@ -25,18 +25,18 @@ struct HTMLParserBuilderTests {
     @Test
     func testParser() throws {
         let capture = HTML {
-            Capture("h1", transform: \.textContent)
-            Capture("#hello", transform: \.textContent)
-            Capture("h1:nth-child(2)", transform: \.textContent)
+            One("h1", transform: \.textContent)
+            One("#hello", transform: \.textContent)
+            One("h1:nth-child(2)", transform: \.textContent)
 
             Group("#group") {
-                Capture("h1", transform: \.textContent)
-                Capture("h2", transform: \.textContent)
+                One("h1", transform: \.textContent)
+                One("h2", transform: \.textContent)
             } transform: { output -> [Pair] in
                 [Pair(output)]
             }
 
-            Capture("#group", transform: Pair.init)
+            One("#group", transform: Pair.init)
         }
 
         let output = try doc.parse(capture)
@@ -62,7 +62,7 @@ struct HTMLParserBuilderTests {
     @Test
     func testSingleCapture() throws {
         let capture = HTML {
-            Capture("#hello", transform: \.textContent)
+            One("#hello", transform: \.textContent)
         }
 
         let output = try doc.parse(capture)
@@ -73,10 +73,10 @@ struct HTMLParserBuilderTests {
     @Test
     func testDecodeFailure() throws {
         let capture = HTML {
-            Capture("#hello")
-            Capture("div", transform: Pair.init)
+            One("#hello")
+            One("div", transform: Pair.init)
             // fail
-            Capture("#hello1", transform: \.textContent)
+            One("#hello1", transform: \.textContent)
         }
         #expect(type(of: capture) == HTML<(any Element, Pair, String)>.self)
 
@@ -93,8 +93,8 @@ struct HTMLParserBuilderTests {
     @Test
     func testDecodeWithZeroOrOne() throws {
         let capture = HTML {
-            Capture("#hello")
-            Capture("div", transform: Pair.init)
+            One("#hello")
+            One("div", transform: Pair.init)
             // returns nil
             ZeroOrOne("#hello1", transform: \.?.textContent)
         }
@@ -109,9 +109,9 @@ struct HTMLParserBuilderTests {
         func capture(_ flag: Bool) -> HTML<String> {
             HTML {
                 if flag {
-                    Capture("#hello", transform: \.textContent)
+                    One("#hello", transform: \.textContent)
                 } else {
-                    Capture("div", transform: \.innerHTML)
+                    One("div", transform: \.innerHTML)
                 }
             }
         }
@@ -125,10 +125,10 @@ struct HTMLParserBuilderTests {
     @Test
     func testTypeConstruction() throws {
         let capture = HTML {
-            Capture("h1") { e -> (String, Int) in
+            One("h1") { e -> (String, Int) in
                 return (e.textContent, 1)
             }
-            Capture("#hello") { e -> (String, i: Int) in
+            One("#hello") { e -> (String, i: Int) in
                 return (e.textContent, 2)
             }
         }
@@ -139,10 +139,10 @@ struct HTMLParserBuilderTests {
         #expect(type(of: output) == ((String, Int), (String, i: Int)).self)
 
         let capture2 = HTML {
-            Capture("h1", transform: \.textContent)
+            One("h1", transform: \.textContent)
             Group("#group") {
-                Capture("h1", transform: \.textContent)
-                Capture("h2", transform: \.textContent)
+                One("h1", transform: \.textContent)
+                One("h2", transform: \.textContent)
             }
         }
 
@@ -151,8 +151,8 @@ struct HTMLParserBuilderTests {
 
         let capture3 = HTML {
             Group("#group") {
-                Capture("h1", transform: \.textContent)
-                Capture("h2", transform: \.textContent)
+                One("h1", transform: \.textContent)
+                One("h2", transform: \.textContent)
             }
         }
 
@@ -211,8 +211,8 @@ struct Pair: Equatable {
 
     init(from document: any Element) throws {
         let capture = HTML {
-            Capture("h1", transform: \.textContent)
-            Capture("h2", transform: \.textContent)
+            One("h1", transform: \.textContent)
+            One("h2", transform: \.textContent)
         }
         let result = try document.parse(capture)
         self.h1 = result.0
@@ -241,15 +241,15 @@ func testGroupTransform() throws {
         """#
 
     let capture = HTML {
-        Capture("h1", transform: \.textContent)
-        Capture("#hello", transform: \.textContent)
+        One("h1", transform: \.textContent)
+        One("#hello", transform: \.textContent)
 
         Group("#group") {
             Many("div.c1") {
                 (elements: [any Element]) -> [(String, String)] in
                 let capture = HTML {
-                    Capture("h1", transform: \.textContent)
-                    Capture("h2", transform: \.textContent)
+                    One("h1", transform: \.textContent)
+                    One("h2", transform: \.textContent)
                 }
                 return try elements.map { try $0.parse(capture) }
             }

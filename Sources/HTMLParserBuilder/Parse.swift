@@ -55,7 +55,7 @@ struct HTMLDecodeImpl {
                 buffer += try parse(node, element: element, next)
             }
             return buffer
-        case .capture(let selector, let transform):
+        case .one(let selector, let transform):
             let e = try element.querySelector(selector)
                 .orThrow(HTMLParseError.cantFindElement(selector: selector))
             if let transform {

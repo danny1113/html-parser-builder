@@ -1,5 +1,5 @@
 //
-//  Capture.swift
+//  One.swift
 //
 //
 //  Created by Danny Pang on 2022/7/2.
@@ -11,17 +11,17 @@
 ///
 /// To returns a first element that matches the selector #selector:
 /// ```swift
-/// Capture("#selector")
+/// One("#selector")
 /// ```
 ///
 /// You can also get properties from an element by provide a transform closure:
 /// ```swift
-/// Capture("#selector", transform: \.textContent)
-/// Capture("#selector") { (e: (any Element)) in
+/// One("#selector", transform: \.textContent)
+/// One("#selector") { (e: (any Element)) in
 ///     return e.textContent
 /// }
 /// ```
-public struct Capture<Output>: Sendable, HTMLComponent {
+public struct One<Output>: Sendable, HTMLComponent {
 
     public let html: HTML<Output>
 
@@ -30,13 +30,13 @@ public struct Capture<Output>: Sendable, HTMLComponent {
         transform: @Sendable @escaping (any Element) throws -> Output
     ) {
         self.html = .init(
-            node: .capture(
+            node: .one(
                 selector: selector,
                 transform: CaptureTransform(transform)
             ))
     }
 
     public init(_ selector: String) where Output == any Element {
-        self.html = .init(node: .capture(selector: selector))
+        self.html = .init(node: .one(selector: selector))
     }
 }
