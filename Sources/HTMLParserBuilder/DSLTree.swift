@@ -10,7 +10,7 @@ struct DSLTree {
         case concatenation([Node])
         case capture(selector: String, transform: CaptureTransform? = nil)
         case zeroOrOne(selector: String, transform: CaptureTransform)
-        case captureAll(selector: String, transform: CaptureTransform? = nil)
+        case many(selector: String, transform: CaptureTransform? = nil)
         case group(
             selector: String, child: Node, transform: CaptureTransform? = nil)
         case root(child: Node, transform: CaptureTransform)
@@ -27,8 +27,8 @@ extension DSLTree.Node: CustomStringConvertible {
             return "capture (\"\(selector)\")"
         case .zeroOrOne(let selector, _):
             return "zeroOrOne (\"\(selector)\")"
-        case .captureAll(let selector, _):
-            return "captureAll (\"\(selector)\")"
+        case .many(let selector, _):
+            return "many (\"\(selector)\")"
         case .group(let selector, let node, _):
             return "group (\"\(selector)\") \(node)"
         case .root(_, _):

@@ -71,7 +71,7 @@ struct HTMLDecodeImpl {
             let e = element.querySelector(selector)
             let function = try? transform.callAsFunction(e)
             return [function as Any]
-        case .captureAll(let selector, let transform):
+        case .many(let selector, let transform):
             let elements: [any Element] = element.querySelectorAll(selector)
             if let transform {
                 let function = try transform.callAsFunction(elements) as Any

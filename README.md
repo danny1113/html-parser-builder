@@ -15,7 +15,7 @@ A result builder that build HTML parser and transform HTML elements to strongly-
     - [HTML](#html)
     - [Capture](#capture)
     - [ZeroOrOne](#zeroorone)
-    - [CaptureAll](#captureall)
+    - [Many](#many)
     - [Group](#group)
     - [LateInit](#lateinit)
     - [Wrap Up](#wrap-up)
@@ -193,15 +193,15 @@ ZeroOrOne("#hello") { (e: (any Element)?) -> String? in
 }
 ```
 
-### CaptureAll
+### Many
 
-Using `CaptureAll` is the same as `querySelectorAll`, you pass in CSS selector to find all HTML elements that match the selector, and you can transform it to any other type you want:
+Using `Many` is the same as `querySelectorAll`, you pass in CSS selector to find all HTML elements that match the selector, and you can transform it to any other type you want:
 
 You can use this API with various declaration that is most suitable for you:
 
 ```swift
-CaptureAll("h1") { $0.map(\.textContent) }
-CaptureAll("h1") { (e: [any Element]) -> [String] in
+Many("h1") { $0.map(\.textContent) }
+Many("h1") { (e: [any Element]) -> [String] in
     return e.map(\.textContent)
 }
 ```
@@ -218,7 +218,7 @@ You can also capture other elements inside and transform to other type:
 ```
 
 ```swift
-CaptureAll("div.group") { (elements: [any Element]) -> [String] in
+Many("div.group") { (elements: [any Element]) -> [String] in
     return elements.compactMap { e in
         return e.querySelector("h1")?.textContent
     }
@@ -277,7 +277,7 @@ let output = doc.parse(container.capture)
 | ---------- | ---------------------------------------------------- |
 | Capture    | Throws error when element can't be captured          |
 | ZeroOrOne  | Returns `nil` when element can't be captured         |
-| CaptureAll | Capture all elements match the selector              |
+| Many       | Capture all elements match the selector              |
 | Group      | Capture elements in the local scope                  |
 | LateInit   | Delay the initialization to first time you access it |
 

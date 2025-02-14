@@ -245,7 +245,7 @@ func testGroupTransform() throws {
         Capture("#hello", transform: \.textContent)
 
         Group("#group") {
-            CaptureAll("div.c1") {
+            Many("div.c1") {
                 (elements: [any Element]) -> [(String, String)] in
                 let capture = HTML {
                     Capture("h1", transform: \.textContent)
