@@ -1,10 +1,9 @@
 //
 //  DSLTree.swift
-//  
+//
 //
 //  Created by Danny Pang on 2022/7/4.
 //
-
 
 struct DSLTree {
     indirect enum Node: Sendable {
@@ -12,7 +11,8 @@ struct DSLTree {
         case capture(selector: String, transform: CaptureTransform? = nil)
         case tryCapture(selector: String, transform: CaptureTransform)
         case captureAll(selector: String, transform: CaptureTransform? = nil)
-        case local(selector: String, child: Node, transform: CaptureTransform? = nil)
+        case local(
+            selector: String, child: Node, transform: CaptureTransform? = nil)
         case root(child: Node, transform: CaptureTransform)
         case empty
     }

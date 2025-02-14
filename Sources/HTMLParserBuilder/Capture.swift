@@ -5,7 +5,6 @@
 //  Created by Danny Pang on 2022/7/2.
 //
 
-
 /// Capture the first element that matches the CSS selector.
 ///
 /// This will throws an error if no element match the CSS selector, if you want to returns an optional element, see ``TryCapture``.
@@ -14,7 +13,7 @@
 /// ```swift
 /// Capture("#selector")
 /// ```
-/// 
+///
 /// You can also get properties from an element by provide a transform closure:
 /// ```swift
 /// Capture("#selector", transform: \.textContent)
@@ -23,19 +22,20 @@
 /// }
 /// ```
 public struct Capture<Output>: Sendable, HTMLComponent {
-    
+
     public let html: HTML<Output>
-    
+
     public init(
         _ selector: String,
         transform: @Sendable @escaping (any Element) throws -> Output
     ) {
-        self.html = .init(node: .capture(
-            selector: selector,
-            transform: CaptureTransform(transform)
-        ))
+        self.html = .init(
+            node: .capture(
+                selector: selector,
+                transform: CaptureTransform(transform)
+            ))
     }
-    
+
     public init(_ selector: String) where Output == any Element {
         self.html = .init(node: .capture(selector: selector))
     }

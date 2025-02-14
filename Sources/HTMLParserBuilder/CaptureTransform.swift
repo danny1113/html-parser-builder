@@ -9,9 +9,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-
 struct CaptureTransform: Sendable, Hashable, CustomStringConvertible {
-    
+
     enum Closure: Sendable {
         /// A failable transform.
         case failable(@Sendable (Any) throws -> Any?)
@@ -25,19 +24,21 @@ struct CaptureTransform: Sendable, Hashable, CustomStringConvertible {
     let argumentType: Any.Type
     let resultType: Any.Type
     let closure: Closure
-    
+
     init(argumentType: Any.Type, resultType: Any.Type, closure: Closure) {
         self.argumentType = argumentType
         self.resultType = resultType
         self.closure = closure
     }
-    
+
     init<Argument, Result>(
-        _ userSpecifiedTransform: @Sendable @escaping (Argument) throws -> Result
+        _ userSpecifiedTransform: @Sendable @escaping (Argument) throws ->
+            Result
     ) {
         let closure: Closure
         if let HTMLElementTransform = userSpecifiedTransform
-            as? @Sendable (any Element) throws -> Result {
+            as? @Sendable (any Element) throws -> Result
+        {
             closure = .HTMLElementNonfailable(HTMLElementTransform)
         } else {
             closure = .nonfailable {
@@ -49,13 +50,15 @@ struct CaptureTransform: Sendable, Hashable, CustomStringConvertible {
             resultType: Result.self,
             closure: closure)
     }
-    
+
     init<Argument, Result>(
-        _ userSpecifiedTransform: @Sendable @escaping (Argument) throws -> Result?
+        _ userSpecifiedTransform: @Sendable @escaping (Argument) throws ->
+            Result?
     ) {
         let closure: Closure
         if let HTMLElementTransform = userSpecifiedTransform
-            as? @Sendable (any Element) throws -> Result? {
+            as? @Sendable (any Element) throws -> Result?
+        {
             closure = .HTMLElementFailable(HTMLElementTransform)
         } else {
             closure = .failable {
@@ -67,10 +70,10 @@ struct CaptureTransform: Sendable, Hashable, CustomStringConvertible {
             resultType: Result.self,
             closure: closure)
     }
-    
+
     func callAsFunction(_ _input: Any?) throws -> Any? {
         let input = _input as Any
-        
+
         switch closure {
         case .nonfailable(let transform):
             let result = try transform(input)
@@ -78,7 +81,7 @@ struct CaptureTransform: Sendable, Hashable, CustomStringConvertible {
             return result
         case .HTMLElementNonfailable(let transform):
             let result = try transform(input as! any Element)
-//            assert(type(of: result) == resultType)
+            //            assert(type(of: result) == resultType)
             return result
         case .failable(let transform):
             guard let result = try transform(input) else {
@@ -94,7 +97,7 @@ struct CaptureTransform: Sendable, Hashable, CustomStringConvertible {
             return result
         }
     }
-    
+
     func callAsFunction(_ input: any Element) throws -> Any? {
         switch closure {
         case .HTMLElementFailable(let transform):
@@ -107,18 +110,18 @@ struct CaptureTransform: Sendable, Hashable, CustomStringConvertible {
             return try transform(input)
         }
     }
-    
+
     static func == (lhs: CaptureTransform, rhs: CaptureTransform) -> Bool {
-        unsafeBitCast(lhs.closure, to: (Int, Int).self) ==
-        unsafeBitCast(rhs.closure, to: (Int, Int).self)
+        unsafeBitCast(lhs.closure, to: (Int, Int).self)
+            == unsafeBitCast(rhs.closure, to: (Int, Int).self)
     }
-    
+
     func hash(into hasher: inout Hasher) {
         let (fn, ctx) = unsafeBitCast(closure, to: (Int, Int).self)
         hasher.combine(fn)
         hasher.combine(ctx)
     }
-    
+
     var description: String {
         "<transform argument_type=\(argumentType) result_type=\(resultType)>"
     }
