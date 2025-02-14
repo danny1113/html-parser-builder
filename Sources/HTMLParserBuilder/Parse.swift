@@ -74,29 +74,11 @@ struct HTMLDecodeImpl {
         case .captureAll(let selector, let transform):
             let elements: [any Element] = element.querySelectorAll(selector)
             if let transform {
-                /*
-                 var buffer = [Any]()
-                 for element in elements {
-                     let function = try transform.callAsFunction(element)
-                     buffer.append(function as Any)
-                 }
-                 result = buffer
-                 */
                 let function = try transform.callAsFunction(elements) as Any
                 return [function]
             } else {
                 return [elements]
             }
-        /*
-        case ._captureAll(let selector, let child):
-            var buffer = [Any]()
-            let elements = element.querySelectorAll(selector)
-            for element in elements {
-                let r = try _parse(child, element: element, next)
-                buffer.append(r)
-            }
-            result = [buffer]
-         */
         case .local(let selector, let child, let transform):
             let e: any Element
             if selector.isEmpty {
@@ -122,12 +104,6 @@ struct HTMLDecodeImpl {
             let r: [Any] = try parse(child, element: element, next)
             let tuple = constructTuple(r)
             return [try transform.callAsFunction(tuple) as Any]
-        //            if r.count == 1 {
-        //                result = [try transform.callAsFunction(r[0]) as Any]
-        //            } else if r.count > 1 {
-        //                let tuple = TypeConstruction.tuple(of: r)
-        //                result = [try transform.callAsFunction(tuple) as Any]
-        //            }
         case .empty:
             return []
         }
@@ -139,20 +115,5 @@ struct HTMLDecodeImpl {
         } else {
             return x[0]
         }
-    }
-
-    private static func traversalTypeConstruct(_ x: Any) -> Any {
-        guard let x = x as? [[Any]] else {
-            if let y = x as? [Any] {
-                return constructTuple(y)
-            } else {
-                return x
-            }
-        }
-
-        let y = x.map {
-            return traversalTypeConstruct($0)
-        }
-        return y
     }
 }
