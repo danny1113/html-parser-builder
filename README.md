@@ -16,7 +16,7 @@ A result builder that build HTML parser and transform HTML elements to strongly-
     - [Capture](#capture)
     - [ZeroOrOne](#zeroorone)
     - [CaptureAll](#captureall)
-    - [Local](#local)
+    - [Group](#group)
     - [LateInit](#lateinit)
     - [Wrap Up](#wrap-up)
   - [Advanced use case](#advanced-use-case)
@@ -91,7 +91,7 @@ let capture = HTML {
         return element?.textContent
     } // => HTML<String?>
     
-    Local("#group") {
+    Group("#group") {
         Capture("h1", transform: \.textContent) // => HTML<String>
         Capture("h2", transform: \.textContent) // => HTML<String>
     } // => HTML<(String, String)>
@@ -107,7 +107,7 @@ let output = try doc.parse(capture)
 // output: (Optional("hello, world"), ("INSIDE GROUP h1", "INSIDE GROUP h2"))
 ```
 
-> **Note**: You can now compose up to 10 components inside the builder, but you can group your captures inside [`Local`](#local) as a workaround.
+> **Note**: You can now compose up to 10 components inside the builder, but you can group your captures inside [`Group`](#group) as a workaround.
 
 ## Usage
 
@@ -229,11 +229,11 @@ CaptureAll("div.group") { (elements: [any Element]) -> [String] in
 
 ---
 
-### Local
+### Group
 
-`Local` will find a HTML element that match the selector, and all the captures inside will find its element based on the element found by `Local`, this is useful when you just want to capture element that is inside the local group.
+`Group` will find a HTML element that match the selector, and all the captures inside will find its element based on the element found by `Group`, this is useful when you just want to capture element that is inside the local group.
 
-Just like `HTML`, `Local` can also transform captured result to other data type by adding `transform`:
+Just like `HTML`, `Group` can also transform captured result to other data type by adding `transform`:
 
 ```swift
 struct Group {
@@ -241,7 +241,7 @@ struct Group {
     let h2: String
 }
 
-Local("#group") {
+Group("#group") {
     Capture("h1", transform: \.textContent) // => HTML<String>
     Capture("h2", transform: \.textContent) // => HTML<String>
 } transform: { (output: (String, String)) -> Group in
@@ -252,7 +252,7 @@ Local("#group") {
 } // => Group
 ```
 
-> **Note**: If `Local` can't find the HTML element that match the selector, it will throw an error cause the whole parse fail, you can use [`ZeroOrOne`](#zeroorone) as alternative.
+> **Note**: If `Group` can't find the HTML element that match the selector, it will throw an error cause the whole parse fail, you can use [`ZeroOrOne`](#zeroorone) as alternative.
 
 ### LateInit
 
@@ -278,7 +278,7 @@ let output = doc.parse(container.capture)
 | Capture    | Throws error when element can't be captured          |
 | ZeroOrOne  | Returns `nil` when element can't be captured         |
 | CaptureAll | Capture all elements match the selector              |
-| Local      | Capture elements in the local scope                  |
+| Group      | Capture elements in the local scope                  |
 | LateInit   | Delay the initialization to first time you access it |
 
 ## Advanced use case
@@ -294,7 +294,7 @@ struct Group {
 
 //       |--------------------------------------------------------------|
 let groupCapture = HTML {                                            // |
-    Local("#group") {                                                // |
+    Group("#group") {                                                // |
         Capture("h1", transform: \.textContent) // => HTML<String>   // |
         Capture("h2", transform: \.textContent) // => HTML<String>   // |
     } // => HTML<(String, String)>                                   // |

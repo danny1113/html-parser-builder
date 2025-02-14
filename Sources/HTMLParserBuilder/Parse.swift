@@ -79,7 +79,7 @@ struct HTMLDecodeImpl {
             } else {
                 return [elements]
             }
-        case .local(let selector, let child, let transform):
+        case .group(let selector, let child, let transform):
             let e: any Element
             if selector.isEmpty {
                 e = element

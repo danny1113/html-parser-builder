@@ -29,21 +29,21 @@ struct HTMLParserBuilderTests {
             Capture("#hello", transform: \.textContent)
             Capture("h1:nth-child(2)", transform: \.textContent)
 
-            Local("#group") {
+            Group("#group") {
                 Capture("h1", transform: \.textContent)
                 Capture("h2", transform: \.textContent)
-            } transform: { output -> [Group] in
-                [Group(output)]
+            } transform: { output -> [Pair] in
+                [Pair(output)]
             }
 
-            Capture("#group", transform: Group.init)
+            Capture("#group", transform: Pair.init)
         }
 
         let output = try doc.parse(capture)
         #expect(
-            type(of: output) == (String, String, String, [Group], Group).self)
+            type(of: output) == (String, String, String, [Pair], Pair).self)
 
-        let group = Group(("Inside group h1", "Inside group h2"))
+        let group = Pair(("Inside group h1", "Inside group h2"))
         #expect(output.0 == "HELLO, 1")
         #expect(output.1 == "HELLO, WORLD")
         #expect(output.2 == "HELLO, 2")
@@ -74,11 +74,11 @@ struct HTMLParserBuilderTests {
     func testDecodeFailure() throws {
         let capture = HTML {
             Capture("#hello")
-            Capture("div", transform: Group.init)
+            Capture("div", transform: Pair.init)
             // fail
             Capture("#hello1", transform: \.textContent)
         }
-        #expect(type(of: capture) == HTML<(any Element, Group, String)>.self)
+        #expect(type(of: capture) == HTML<(any Element, Pair, String)>.self)
 
         do {
             let _ = try doc.parse(capture)
@@ -94,13 +94,13 @@ struct HTMLParserBuilderTests {
     func testDecodeWithZeroOrOne() throws {
         let capture = HTML {
             Capture("#hello")
-            Capture("div", transform: Group.init)
+            Capture("div", transform: Pair.init)
             // returns nil
             ZeroOrOne("#hello1", transform: \.?.textContent)
         }
 
         let output = try doc.parse(capture)
-        #expect(type(of: output) == (any Element, Group, String?).self)
+        #expect(type(of: output) == (any Element, Pair, String?).self)
     }
 
     @Test
@@ -140,7 +140,7 @@ struct HTMLParserBuilderTests {
 
         let capture2 = HTML {
             Capture("h1", transform: \.textContent)
-            Local("#group") {
+            Group("#group") {
                 Capture("h1", transform: \.textContent)
                 Capture("h2", transform: \.textContent)
             }
@@ -150,7 +150,7 @@ struct HTMLParserBuilderTests {
         #expect(type(of: output2) == (String, (String, String)).self)
 
         let capture3 = HTML {
-            Local("#group") {
+            Group("#group") {
                 Capture("h1", transform: \.textContent)
                 Capture("h2", transform: \.textContent)
             }
@@ -200,7 +200,7 @@ struct HTMLParserBuilderTests {
     }
 }
 
-struct Group: Equatable {
+struct Pair: Equatable {
     let h1: String
     let h2: String
 
@@ -221,7 +221,7 @@ struct Group: Equatable {
 }
 
 @Test
-func testLocalTransform() throws {
+func testGroupTransform() throws {
     let html = #"""
         <h1>HELLO, 1</h1>
         <h1>HELLO, 2</h1>
@@ -244,7 +244,7 @@ func testLocalTransform() throws {
         Capture("h1", transform: \.textContent)
         Capture("#hello", transform: \.textContent)
 
-        Local("#group") {
+        Group("#group") {
             CaptureAll("div.c1") {
                 (elements: [any Element]) -> [(String, String)] in
                 let capture = HTML {
@@ -253,19 +253,19 @@ func testLocalTransform() throws {
                 }
                 return try elements.map { try $0.parse(capture) }
             }
-        } transform: { output -> [Group] in
-            return output.map(Group.init)
+        } transform: { output -> [Pair] in
+            return output.map(Pair.init)
         }
     }
 
     let doc = try SoupDoc(string: html)
     let output = try doc.parse(capture)
-    #expect(type(of: output) == (String, String, [Group]).self)
+    #expect(type(of: output) == (String, String, [Pair]).self)
     #expect(output.0 == "HELLO, 1")
     #expect(output.1 == "HELLO, WORLD")
     #expect(
         output.2 == [
-            Group(("HELLO, class 1", "HELLO, class 2")),
-            Group(("HELLO, class 3", "HELLO, class 4")),
+            Pair(("HELLO, class 1", "HELLO, class 2")),
+            Pair(("HELLO, class 3", "HELLO, class 4")),
         ])
 }
