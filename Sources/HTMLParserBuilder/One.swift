@@ -50,8 +50,7 @@ public struct One<Output>: Sendable, HTMLComponent {
     }
 
     public func parse(from element: any Element) throws -> Output {
-        let e = try element.querySelector(selector)
-            .orThrow(HTMLParseError.cantFindElement(selector: selector))
+        let e: any Element = try element.querySelector(selector)
         return try _transform(e)
     }
 }

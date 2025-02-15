@@ -36,8 +36,7 @@ public struct Group<Output>: Sendable, HTMLComponent {
         self.selector = selector
         let html = component()
         self._parse = { element in
-            let e = try element.querySelector(selector)
-                .orThrow(HTMLParseError.cantFindElement(selector: selector))
+            let e: any Element = try element.querySelector(selector)
             return try html.parse(from: e)
         }
     }
