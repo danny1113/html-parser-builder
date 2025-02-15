@@ -38,6 +38,7 @@
 /// // => [String]
 /// // output: ["Group 1", "Group 2"]
 /// ```
+@frozen
 public struct Many<Output>: Sendable, HTMLComponent {
 
     private let selector: String

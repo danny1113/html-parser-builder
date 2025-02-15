@@ -31,6 +31,7 @@
 ///     Pair(h1: output.1, h2: output.2)
 /// }
 /// ```
+@frozen
 public struct Group<Output>: Sendable, HTMLComponent {
 
     private let selector: String

@@ -6,17 +6,19 @@
 //
 
 @propertyWrapper
+@frozen
 public struct LateInit<DataType> {
 
-    typealias InitClosure = () -> DataType
+    public typealias InitClosure = () -> DataType
 
     private var initClosure: InitClosure!
+    private var _data: DataType!
 
-    public init(wrappedValue: @autoclosure @escaping () -> DataType) {
+    public init(
+        wrappedValue: @autoclosure @escaping InitClosure
+    ) {
         self.initClosure = wrappedValue
     }
-
-    private var _data: DataType!
 
     public var wrappedValue: DataType {
         mutating get {

@@ -21,6 +21,7 @@
 ///     return e.textContent
 /// }
 /// ```
+@frozen
 public struct One<Output>: Sendable, HTMLComponent {
 
     private let selector: String

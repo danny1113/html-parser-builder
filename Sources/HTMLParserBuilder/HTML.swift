@@ -29,6 +29,7 @@
 ///
 /// For more information about other building blocks to build a html parser,
 /// see ``One``, ``ZeroOrOne``, ``Group``.
+@frozen
 public struct HTML<Output>: Sendable, HTMLComponent {
 
     private let _parse: @Sendable (any Element) throws -> Output

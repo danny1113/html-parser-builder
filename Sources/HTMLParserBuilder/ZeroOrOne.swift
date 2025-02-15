@@ -21,6 +21,7 @@
 ///     return e?.textContent
 /// }
 /// ```
+@frozen
 public struct ZeroOrOne<Output>: Sendable, HTMLComponent {
 
     private let selector: String
