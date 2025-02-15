@@ -21,8 +21,10 @@ struct SoupDoc: HTMLParserBuilder.Document {
         self.doc = doc
     }
 
-    var rootElement: SoupElem {
-        let elem = doc.body()!
+    var rootElement: SoupElem? {
+        guard let elem = doc.body() else {
+            return nil
+        }
         return SoupElem(elem: elem)
     }
 
@@ -85,7 +87,7 @@ struct SoupElem: HTMLParserBuilder.Element {
         return elements.map(SoupElem.init)
     }
 
-    var elementId: String {
+    var id: String? {
         elem.id()
     }
 

@@ -9,7 +9,7 @@
 public protocol Document {
     associatedtype E: Element
 
-    var rootElement: E { get }
+    var rootElement: E? { get }
 }
 
 /// A type that represents part of a HTML DOM element.
@@ -19,7 +19,7 @@ public protocol Element {
     var innerHTML: String { get }
     var outerHTML: String { get }
 
-    var elementId: String { get }
+    var id: String? { get }
 
     var className: String { get }
     var classList: [String] { get }
