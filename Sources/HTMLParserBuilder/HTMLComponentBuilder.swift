@@ -6,36 +6,23 @@
 //
 
 @resultBuilder
+@frozen
 public enum HTMLComponentBuilder {
-
     public static func buildBlock<each C: HTMLComponent>(
         _ component: repeat each C
-    ) -> HTML<(repeat (each C).HTMLOutput)> {
-        var nodes: [DSLTree.Node] = []
-        repeat nodes.append((each component).html.node)
-
-        return HTML(node: .concatenation(nodes))
+    ) -> HTML<(repeat (each C).Output)> {
+        return HTML(component: (repeat (each component)))
     }
 
-    public static func buildEither<Content: HTMLComponent>(
-        first component: Content
-    ) -> Content {
-        return component
+    public static func buildEither<each C: HTMLComponent>(
+        first component: repeat each C
+    ) -> (repeat each C) {
+        return (repeat (each component))
     }
 
-    public static func buildEither<Content: HTMLComponent>(
-        second component: Content
-    ) -> Content {
-        return component
-    }
-
-    public static func buildOptional<Content: HTMLComponent>(
-        _ component: Content?
-    ) -> HTML<Content> {
-        if let component {
-            return HTML(node: component.html.node)
-        } else {
-            return HTML(node: .empty)
-        }
+    public static func buildEither<each C: HTMLComponent>(
+        second component: repeat each C
+    ) -> (repeat each C) {
+        return (repeat (each component))
     }
 }

@@ -23,20 +23,35 @@
 /// ```
 public struct One<Output>: Sendable, HTMLComponent {
 
-    public let html: HTML<Output>
+    private let selector: String
+    private let _transform: @Sendable (any Element) throws -> Output
+
+    public init(_ selector: String) where Output == any Element {
+        self.selector = selector
+        self._transform = { e in e }
+    }
 
     public init(
         _ selector: String,
         transform: @Sendable @escaping (any Element) throws -> Output
     ) {
-        self.html = .init(
-            node: .one(
-                selector: selector,
-                transform: CaptureTransform(transform)
-            ))
+        self.selector = selector
+        self._transform = transform
     }
 
-    public init(_ selector: String) where Output == any Element {
-        self.html = .init(node: .one(selector: selector))
+    public consuming func map<NewOutput>(
+        _ f: @Sendable @escaping (Output) throws -> NewOutput
+    ) -> One<NewOutput> {
+        let transform = _transform
+        return .init(selector) { e in
+            let output = try transform(e)
+            return try f(output)
+        }
+    }
+
+    public func parse(from element: any Element) throws -> Output {
+        let e = try element.querySelector(selector)
+            .orThrow(HTMLParseError.cantFindElement(selector: selector))
+        return try _transform(e)
     }
 }

@@ -23,16 +23,24 @@
 /// ```
 public struct ZeroOrOne<Output>: Sendable, HTMLComponent {
 
-    public let html: HTML<Output>
+    private let selector: String
+    private let _transform: @Sendable ((any Element)?) throws -> Output
+
+    public init(_ selector: String) where Output == (any Element)? {
+        self.selector = selector
+        self._transform = { e in e }
+    }
 
     public init(
         _ selector: String,
         transform: @Sendable @escaping ((any Element)?) throws -> Output
     ) {
-        self.html = .init(
-            node: .zeroOrOne(
-                selector: selector,
-                transform: CaptureTransform(transform)
-            ))
+        self.selector = selector
+        self._transform = transform
+    }
+
+    public func parse(from element: any Element) throws -> Output {
+        let e: (any Element)? = element.querySelector(selector)
+        return try _transform(e)
     }
 }

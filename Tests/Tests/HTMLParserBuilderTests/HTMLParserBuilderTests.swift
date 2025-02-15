@@ -11,6 +11,10 @@ struct HTMLParserBuilderTests {
         <div id="group">
             <h1>Inside group h1</h1>
             <h2>Inside group h2</h2>
+            <div id="group2">
+                <h1>Inside group2 h1</h1>
+                <h2>Inside group2 h2</h2>
+            </div>
         </div>
         <h1 class="c1">HELLO, class 1</h1>
         <h1 class="c1">HELLO, class 2</h1>
@@ -32,7 +36,8 @@ struct HTMLParserBuilderTests {
             Group("#group") {
                 One("h1", transform: \.textContent)
                 One("h2", transform: \.textContent)
-            } transform: { output -> [Pair] in
+            }
+            .map { output -> [Pair] in
                 [Pair(output)]
             }
 
@@ -158,6 +163,26 @@ struct HTMLParserBuilderTests {
 
         let output3 = try doc.parse(capture3)
         #expect(type(of: output3) == (String, String).self)
+
+        let capture4 = HTML {
+            Group("#group") {
+                One("h1", transform: \.textContent)
+                One("h2", transform: \.textContent)
+                Group("#group2") {
+                    One("h1", transform: \.textContent)
+                    One("h2", transform: \.textContent)
+                }
+                .map(Pair.init)
+            }
+        }
+
+        let output4 = try doc.parse(capture4)
+        #expect(type(of: output4) == (String, String, Pair).self)
+        #expect(
+            output4 == (
+                "Inside group h1", "Inside group h2",
+                Pair(("Inside group2 h1", "Inside group2 h2"))
+            ))
     }
 
     @Test
@@ -236,26 +261,29 @@ func testGroupTransform() throws {
                 <h2 class="c1">HELLO, class 4</h2>
             </div>
         </div>
-        <h1 class="c1">HELLO, class 1</h1>
-        <h1 class="c1">HELLO, class 2</h1>
+        <h1 class="c1">HELLO, class 5</h1>
+        <h1 class="c1">HELLO, class 6</h1>
         """#
 
-    let capture = HTML {
+    let pairCapture = HTML {
         One("h1", transform: \.textContent)
-        One("#hello", transform: \.textContent)
+        One("h2", transform: \.textContent)
+    }
 
-        Group("#group") {
-            Many("div.c1") {
-                (elements: [any Element]) -> [(String, String)] in
-                let capture = HTML {
-                    One("h1", transform: \.textContent)
-                    One("h2", transform: \.textContent)
-                }
-                return try elements.map { try $0.parse(capture) }
-            }
-        } transform: { output -> [Pair] in
-            return output.map(Pair.init)
+    let groupCapture: Group<[Pair]> = Group("#group") {
+        Many("div.c1") { elements -> [(String, String)] in
+            return try elements.map { try $0.parse(pairCapture) }
         }
+    }
+    .map { (output: [(String, String)]) -> [Pair] in
+        return output.map(Pair.init)
+    }
+
+    let capture = HTML {
+        One("h1").map(\.textContent)
+        One("#hello").map(\.textContent)
+
+        groupCapture
     }
 
     let doc = try SoupDoc(string: html)

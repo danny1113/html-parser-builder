@@ -40,20 +40,24 @@
 /// ```
 public struct Many<Output>: Sendable, HTMLComponent {
 
-    public let html: HTML<Output>
+    private let selector: String
+    private let _transform: @Sendable ([any Element]) throws -> Output
+
+    public init(_ selector: String) where Output == [any Element] {
+        self.selector = selector
+        self._transform = { e in e }
+    }
 
     public init(
         _ selector: String,
         transform: @Sendable @escaping ([any Element]) throws -> Output
     ) {
-        self.html = .init(
-            node: .many(
-                selector: selector,
-                transform: CaptureTransform(transform)
-            ))
+        self.selector = selector
+        self._transform = transform
     }
 
-    public init(_ selector: String) where Output == [any Element] {
-        self.html = .init(node: .many(selector: selector))
+    public func parse(from element: any Element) throws -> Output {
+        let e = element.querySelectorAll(selector)
+        return try _transform(e)
     }
 }

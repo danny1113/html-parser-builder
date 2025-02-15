@@ -31,8 +31,8 @@ public protocol Element {
     subscript(_ key: String) -> String? { get }
 
     func querySelector(_ selector: String) -> Self?
+    func querySelector(_ selector: String) throws -> Self
     func querySelectorAll(_ selector: String) -> [Self]
-    func tryQuerySelector(_ selector: String) throws -> Self
 
     func getElementById(_ id: String) -> Self?
     func getElementsByClassName(_ className: String) -> [Self]
@@ -40,7 +40,7 @@ public protocol Element {
 }
 
 extension Element {
-    public func tryQuerySelector(_ selector: String) throws -> Self {
+    public func querySelector(_ selector: String) throws -> Self {
         try self.querySelector(selector)
             .orThrow(HTMLParseError.cantFindElement(selector: selector))
     }

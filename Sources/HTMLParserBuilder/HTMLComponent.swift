@@ -6,15 +6,8 @@
 //
 
 /// A type that represents part of the component in html.
-public protocol HTMLComponent<HTMLOutput> {
-    associatedtype HTMLOutput
+public protocol HTMLComponent<Output>: Sendable {
+    associatedtype Output
 
-    var html: HTML<HTMLOutput> { get }
-}
-
-extension HTMLComponent {
-    public func debug() -> Self {
-        print(Mirror(reflecting: self).subjectType)
-        return self
-    }
+    func parse(from element: any Element) throws -> Output
 }

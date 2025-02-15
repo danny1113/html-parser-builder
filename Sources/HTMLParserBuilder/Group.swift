@@ -17,37 +17,42 @@
 /// ```
 public struct Group<Output>: Sendable, HTMLComponent {
 
-    public let html: HTML<Output>
+    private let selector: String
+    private let _parse: @Sendable (any Element) throws -> Output
 
-    init(_ selector: String, child: DSLTree.Node) {
-        self.html = .init(
-            node: .group(
-                selector: selector,
-                child: child
-            ))
-    }
-
-    public init<Component: HTMLComponent>(
-        _ selector: String = "",
-        @HTMLComponentBuilder _ component: () -> Component
-    ) where Output == Component.HTMLOutput {
-        self.html = .init(
-            node: .group(
-                selector: selector,
-                child: component().html.node
-            ))
-    }
-
-    public init<Component: HTMLComponent>(
-        _ selector: String = "",
-        @HTMLComponentBuilder _ component: () -> Component,
-        transform: @Sendable @escaping (Component.HTMLOutput) -> Output
+    private init(
+        selector: String,
+        parse: @Sendable @escaping (any Element) throws -> Output
     ) {
-        self.html = .init(
-            node: .group(
-                selector: selector,
-                child: component().html.node,
-                transform: .init(transform)
-            ))
+        self.selector = selector
+        self._parse = parse
+    }
+
+    public init(
+        _ selector: String,
+        @HTMLComponentBuilder
+        component: () -> HTML<Output>
+    ) {
+        self.selector = selector
+        let html = component()
+        self._parse = { element in
+            let e = try element.querySelector(selector)
+                .orThrow(HTMLParseError.cantFindElement(selector: selector))
+            return try html.parse(from: e)
+        }
+    }
+
+    consuming func map<NewOutput>(
+        _ f: @Sendable @escaping (Output) throws -> NewOutput
+    ) -> Group<NewOutput> {
+        let parse = self._parse
+        return .init(selector: selector) { e in
+            let output = try parse(e)
+            return try f(output)
+        }
+    }
+
+    public func parse(from element: any Element) throws -> Output {
+        return try _parse(element)
     }
 }
