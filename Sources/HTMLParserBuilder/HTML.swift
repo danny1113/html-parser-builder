@@ -57,7 +57,7 @@ public struct HTML<Output>: Sendable, HTMLComponent {
         }
     }
 
-    consuming func map<NewOutput>(
+    public consuming func map<NewOutput>(
         _ f: @Sendable @escaping (Output) throws -> NewOutput
     ) -> HTML<NewOutput> {
         let parse = self._parse
