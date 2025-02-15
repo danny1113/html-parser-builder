@@ -40,6 +40,7 @@ public protocol Element {
 }
 
 extension Element {
+    @inlinable
     public func querySelector(_ selector: String) throws -> Self {
         try self.querySelector(selector)
             .orThrow(HTMLParseError.cantFindElement(selector: selector))
@@ -58,5 +59,26 @@ extension Element {
     @inlinable
     public func getElementsByTagName(_ tagName: String) -> [Self] {
         return querySelectorAll(tagName)
+    }
+}
+
+extension Document {
+    @inlinable
+    public func parse<Output>(
+        _ html: HTML<Output>
+    ) throws -> Output {
+        guard let rootElement else {
+            throw HTMLParseError.description("rootElement is nil")
+        }
+        return try html.parse(from: rootElement)
+    }
+}
+
+extension Element {
+    @inlinable
+    public func parse<Output>(
+        _ html: HTML<Output>
+    ) throws -> Output {
+        try html.parse(from: self)
     }
 }

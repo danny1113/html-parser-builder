@@ -110,14 +110,12 @@ struct HTMLParserBuilderTests {
 
     @Test
     func testIfCase() throws {
-        // capture has to be rebuild when flag change
+        @HTMLComponentBuilder
         func capture(_ flag: Bool) -> HTML<String> {
-            HTML {
-                if flag {
-                    One("#hello", transform: \.textContent)
-                } else {
-                    One("div", transform: \.innerHTML)
-                }
+            if flag {
+                One("#hello", transform: \.textContent)
+            } else {
+                One("div", transform: \.innerHTML)
             }
         }
 
