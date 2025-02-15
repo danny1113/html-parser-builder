@@ -3,8 +3,6 @@
 
 A result builder that build HTML parser and transform HTML elements to strongly-typed result, inspired by RegexBuilder.
 
-> **Note**: `CaptureTransform.swift`, `TypeConstruction.swift` are copied from [apple/swift-experimental-string-processing](https://github.com/apple/swift-experimental-string-processing/).
-
 - [HTMLParserBuilder](#htmlparserbuilder)
   - [Installation](#installation)
     - [Requirement](#requirement)
@@ -30,13 +28,7 @@ A result builder that build HTML parser and transform HTML elements to strongly-
 - iOS 13.0
 - tvOS 13.0
 - watchOS 6.0
-
-```swift
-dependencies: [
-    // ...
-    .package(name: "HTMLParserBuilder", url: "https://github.com/danny1113/html-parser-builder.git", from: "2.0.0"),
-]
-```
+- visionOS 1.0
 
 ## Introduction
 
@@ -120,11 +112,14 @@ For example, you can use SwiftSoup as the html parser, example for conformance t
 ```swift
 dependencies: [
     // ...
-    .package(url: "https://github.com/scinfu/SwiftSoup.git", from: "2.6.0"),
-    .package(name: "HTMLParserBuilder", url: "https://github.com/danny1113/html-parser-builder.git", from: "2.0.0"),
+    .package(url: "https://github.com/scinfu/SwiftSoup.git", .upToNextMajor(from: "2.7.7")),
+    .package(url: "https://github.com/danny1113/html-parser-builder.git", from: "3.0.0"),
 ],
 targets: [
-    .target(name: "YourTarget", dependencies: ["SwiftSoup", "HTMLParserBuilder"]),
+    .target(name: "YourTarget", dependencies: [
+        "SwiftSoup",
+        .product(name: "HTMLParserBuilder", package: "html-parser-builder"),
+    ]),
 ]
 ```
 
@@ -149,8 +144,8 @@ struct Pair {
 let capture = HTML {
     One("#group h1", transform: \.textContent) // => HTML<String>
     One("#group h2", transform: \.textContent) // => HTML<String>
-    
-} transform: { (output: (String, String)) -> Pair in
+}
+.map { (output: (String, String)) -> Pair in
     return Pair(
         h1: output.0,
         h2: output.1
@@ -244,7 +239,8 @@ struct Pair {
 Group("#group") {
     One("h1", transform: \.textContent) // => HTML<String>
     One("h2", transform: \.textContent) // => HTML<String>
-} transform: { (output: (String, String)) -> Pair in
+}
+.map { (output: (String, String)) -> Pair in
     return Pair(
         h1: output.0,
         h2: output.1
@@ -298,8 +294,8 @@ let groupCapture = HTML {                                            // |
         One("h1", transform: \.textContent) // => HTML<String>       // |
         One("h2", transform: \.textContent) // => HTML<String>       // |
     } // => HTML<(String, String)>                                   // |
-                                                                     // |
-} transform: { output -> Pair in                                     // |
+}                                                                    // |
+.map { output -> Pair in                                             // |
     return Pair(                                                     // |
         h1: output.0,                                                // |
         h2: output.1                                                 // |
