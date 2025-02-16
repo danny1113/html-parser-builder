@@ -33,33 +33,6 @@ public protocol Element {
     func querySelector(_ selector: String) -> Self?
     func querySelector(_ selector: String) throws -> Self
     func querySelectorAll(_ selector: String) -> [Self]
-
-    func getElementById(_ id: String) -> Self?
-    func getElementsByClassName(_ className: String) -> [Self]
-    func getElementsByTagName(_ tagName: String) -> [Self]
-}
-
-extension Element {
-    @inlinable
-    public func querySelector(_ selector: String) throws -> Self {
-        try self.querySelector(selector)
-            .orThrow(HTMLParseError.cantFindElement(selector: selector))
-    }
-
-    @inlinable
-    public func getElementById(_ id: String) -> Self? {
-        return querySelector("#" + id)
-    }
-
-    @inlinable
-    public func getElementsByClassName(_ className: String) -> [Self] {
-        return querySelectorAll("." + className)
-    }
-
-    @inlinable
-    public func getElementsByTagName(_ tagName: String) -> [Self] {
-        return querySelectorAll(tagName)
-    }
 }
 
 extension Document {
