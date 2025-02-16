@@ -107,7 +107,7 @@ let output = try doc.parse(capture)
 
 HTMLParserBuilder doesn't rely on any html parser, so you can chose any html parser you want to use, as long as it conforms to the `Document` and `Element` protocol.
 
-For example, you can use SwiftSoup as the html parser, example for conformance to the `Document` and `Element` protocol is available in `Tests/HTMLParserBuilderTests/SwiftSoup+HTMLParserBuilder.swift`.
+For example, you can use SwiftSoup as the html parser, example for conformance to the `Document` and `Element` protocol is available in `Sources/HTMLParserBuilder/Example`.
 
 ```swift
 dependencies: [
