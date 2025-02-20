@@ -25,11 +25,11 @@
 public struct ZeroOrOne<Output>: Sendable, HTMLComponent {
 
     private let selector: String
-    private let _transform: @Sendable ((any Element)?) throws -> Output
+    private let transform: @Sendable ((any Element)?) throws -> Output
 
     public init(_ selector: String) where Output == (any Element)? {
         self.selector = selector
-        self._transform = { e in e }
+        self.transform = { e in e }
     }
 
     public init(
@@ -37,11 +37,11 @@ public struct ZeroOrOne<Output>: Sendable, HTMLComponent {
         transform: @Sendable @escaping ((any Element)?) throws -> Output
     ) {
         self.selector = selector
-        self._transform = transform
+        self.transform = transform
     }
 
     public func parse(from element: any Element) throws -> Output {
         let e: (any Element)? = element.querySelector(selector)
-        return try _transform(e)
+        return try transform(e)
     }
 }

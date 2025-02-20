@@ -25,11 +25,11 @@
 public struct One<Output>: Sendable, HTMLComponent {
 
     private let selector: String
-    private let _transform: @Sendable (any Element) throws -> Output
+    private let transform: @Sendable (any Element) throws -> Output
 
     public init(_ selector: String) where Output == any Element {
         self.selector = selector
-        self._transform = { e in e }
+        self.transform = { e in e }
     }
 
     public init(
@@ -37,13 +37,13 @@ public struct One<Output>: Sendable, HTMLComponent {
         transform: @Sendable @escaping (any Element) throws -> Output
     ) {
         self.selector = selector
-        self._transform = transform
+        self.transform = transform
     }
 
     public consuming func map<NewOutput>(
         _ f: @Sendable @escaping (Output) throws -> NewOutput
     ) -> One<NewOutput> {
-        let transform = _transform
+        let transform = transform
         return .init(selector) { e in
             let output = try transform(e)
             return try f(output)
@@ -52,6 +52,6 @@ public struct One<Output>: Sendable, HTMLComponent {
 
     public func parse(from element: any Element) throws -> Output {
         let e: any Element = try element.querySelector(selector)
-        return try _transform(e)
+        return try transform(e)
     }
 }
