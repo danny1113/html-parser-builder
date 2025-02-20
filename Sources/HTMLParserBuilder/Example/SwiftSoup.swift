@@ -51,16 +51,12 @@ struct SoupElem: HTMLParserBuilder.Element {
         self.elem = elem
     }
 
-    func querySelector(_ selector: String) -> SoupElem? {
-        guard let elem = try? elem.select(selector).first() else {
-            return nil
-        }
-        return SoupElem(elem: elem)
-    }
-
     func querySelector(_ selector: String) throws -> SoupElem {
-        try self.querySelector(selector)
-            .orThrow(HTMLParseError.cantFindElement(selector: selector))
+        guard let elem = try elem.select(selector).first() else {
+            throw HTMLParseError.cantFindElement(selector: selector)
+        }
+
+        return SoupElem(elem: elem)
     }
 
     func querySelectorAll(_ selector: String) -> [SoupElem] {

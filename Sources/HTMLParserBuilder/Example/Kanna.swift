@@ -68,9 +68,9 @@ struct KannaElement: Element {
         element[key]
     }
 
-    func querySelector(_ selector: String) -> KannaElement? {
+    func querySelector(_ selector: String) throws -> KannaElement {
         guard let element = element.at_css(selector) else {
-            return nil
+            throw HTMLParseError.cantFindElement(selector: selector)
         }
         return KannaElement(element: element)
     }

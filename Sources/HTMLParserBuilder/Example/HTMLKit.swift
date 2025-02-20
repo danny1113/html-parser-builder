@@ -79,9 +79,9 @@ final class HTMLKitElement: Element {
         element.attributes[attribute] != nil
     }
 
-    func querySelector(_ selector: String) -> HTMLKitElement? {
+    func querySelector(_ selector: String) throws -> HTMLKitElement {
         guard let element = element.querySelector(selector) else {
-            return nil
+            throw HTMLParseError.cantFindElement(selector: selector)
         }
         return Self(element: element)
     }

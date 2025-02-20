@@ -41,7 +41,7 @@ public struct ZeroOrOne<Output>: Sendable, HTMLComponent {
     }
 
     public func parse(from element: any Element) throws -> Output {
-        let e: (any Element)? = element.querySelector(selector)
+        let e = try? element.querySelector(selector)
         return try transform(e)
     }
 }
