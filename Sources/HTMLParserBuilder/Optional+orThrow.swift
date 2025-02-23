@@ -1,10 +1,9 @@
 //
 //  Optional+orThrow.swift
-//  
+//
 //
 //  Created by Danny Pang on 2022/7/9.
 //
-
 
 extension Optional {
     public func orThrow<E: Error>(
