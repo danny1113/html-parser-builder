@@ -68,14 +68,14 @@ struct KannaElement: Element {
         element[key]
     }
 
-    func querySelector(_ selector: String) throws -> KannaElement {
+    func query(selector: String) throws -> KannaElement {
         guard let element = element.at_css(selector) else {
             throw HTMLParseError.cantFindElement(selector: selector)
         }
         return KannaElement(element: element)
     }
 
-    func querySelectorAll(_ selector: String) -> [KannaElement] {
+    func queryAll(selector: String) -> [KannaElement] {
         // TODO
         return []
     }

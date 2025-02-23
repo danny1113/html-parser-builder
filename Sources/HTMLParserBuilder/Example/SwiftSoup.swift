@@ -28,14 +28,14 @@ struct SoupDoc: HTMLParserBuilder.Document {
         return SoupElem(elem: elem)
     }
 
-    func querySelector(_ selector: String) -> SoupElem? {
+    func query(selector: String) -> SoupElem? {
         guard let elem = try? doc.select(selector).first() else {
             return nil
         }
         return SoupElem(elem: elem)
     }
 
-    func querySelectorAll(_ selector: String) -> [SoupElem] {
+    func queryAll(selector: String) -> [SoupElem] {
         guard let elements = try? doc.select(selector) else {
             return []
         }
@@ -51,7 +51,7 @@ struct SoupElem: HTMLParserBuilder.Element {
         self.elem = elem
     }
 
-    func querySelector(_ selector: String) throws -> SoupElem {
+    func query(selector: String) throws -> SoupElem {
         guard let elem = try elem.select(selector).first() else {
             throw HTMLParseError.cantFindElement(selector: selector)
         }
@@ -59,7 +59,7 @@ struct SoupElem: HTMLParserBuilder.Element {
         return SoupElem(elem: elem)
     }
 
-    func querySelectorAll(_ selector: String) -> [SoupElem] {
+    func queryAll(selector: String) -> [SoupElem] {
         guard let elements = try? elem.select(selector) else {
             return []
         }

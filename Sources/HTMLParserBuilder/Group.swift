@@ -53,7 +53,7 @@ public struct Group<Output>: Sendable, HTMLComponent {
         self.selector = selector
         let html = component()
         self._parse = { element in
-            let e: any Element = try element.querySelector(selector)
+            let e: any Element = try element.query(selector: selector)
             return try html.parse(from: e)
         }
     }

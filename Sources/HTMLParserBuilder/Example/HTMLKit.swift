@@ -79,15 +79,15 @@ final class HTMLKitElement: Element {
         element.attributes[attribute] != nil
     }
 
-    func querySelector(_ selector: String) throws -> HTMLKitElement {
-        guard let element = element.querySelector(selector) else {
+    func query(selector: String) throws -> HTMLKitElement {
+        guard let element = element.query(selector: selector) else {
             throw HTMLParseError.cantFindElement(selector: selector)
         }
         return Self(element: element)
     }
 
-    func querySelectorAll(_ selector: String) -> [HTMLKitElement] {
-        let elements = element.querySelectorAll(selector)
+    func queryAll(selector: String) -> [HTMLKitElement] {
+        let elements = element.queryAll(selector: selector)
         return elements.map { element in
             .init(element: element)
         }

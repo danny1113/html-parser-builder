@@ -7,7 +7,7 @@
 
 /// Capture all element that matches the CSS selector.
 ///
-/// Using Many is the same as querySelectorAll,
+/// Using Many is the same as `querySelectorAll`,
 /// you pass in CSS selector to find all HTML elements that match the selector,
 /// and you can transform it to any other type you want:
 ///
@@ -32,7 +32,7 @@
 /// ```swift
 /// Many("div.group") { (elements: [any Element]) -> [String] in
 ///     return elements.compactMap { e in
-///         return e.querySelector("h1")?.textContent
+///         return e.query(selector: "h1")?.textContent
 ///     }
 /// }
 /// // => [String]
@@ -58,7 +58,7 @@ public struct Many<Output>: Sendable, HTMLComponent {
     }
 
     public func parse(from element: any Element) throws -> Output {
-        let e = element.querySelectorAll(selector)
+        let e = element.queryAll(selector: selector)
         return try transform(e)
     }
 }

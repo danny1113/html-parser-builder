@@ -30,8 +30,11 @@ public protocol Element {
 
     subscript(_ key: String) -> String? { get }
 
-    func querySelector(_ selector: String) throws -> Self
-    func querySelectorAll(_ selector: String) -> [Self]
+    /// Same as `querySelector`.
+    func query(selector: String) throws -> Self
+
+    /// Same as `querySelectorAll`.
+    func queryAll(selector: String) -> [Self]
 }
 
 extension Document {

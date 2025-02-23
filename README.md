@@ -215,7 +215,7 @@ You can also capture other elements inside and transform to other type:
 ```swift
 Many("div.group") { (elements: [any Element]) -> [String] in
     return elements.compactMap { e in
-        return e.querySelector("h1")?.textContent
+        return e.query(selector: "h1")?.textContent
     }
 }
 // => [String]
