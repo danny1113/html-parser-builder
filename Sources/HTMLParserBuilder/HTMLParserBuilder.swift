@@ -37,7 +37,7 @@ public protocol Element {
 extension Document {
     @inlinable
     public func parse<Output>(
-        _ html: HTML<Output>
+        _ html: borrowing HTML<Output>
     ) throws -> Output {
         guard let rootElement else {
             throw HTMLParseError.description("rootElement is nil")
@@ -49,7 +49,7 @@ extension Document {
 extension Element {
     @inlinable
     public func parse<Output>(
-        _ html: HTML<Output>
+        _ html: borrowing HTML<Output>
     ) throws -> Output {
         try html.parse(from: self)
     }
