@@ -278,8 +278,8 @@ func testGroupTransform() throws {
     }
 
     let capture = HTML {
-        One("h1").map(\.textContent)
-        One("#hello").map(\.textContent)
+        One("h1", transform: \.textContent)
+        One("#hello", transform: \.textContent)
 
         groupCapture
     }
