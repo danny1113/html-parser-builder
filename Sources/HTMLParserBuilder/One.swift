@@ -40,16 +40,6 @@ public struct One<Output>: Sendable, HTMLComponent {
         self.transform = transform
     }
 
-    public consuming func map<NewOutput>(
-        _ f: @Sendable @escaping (Output) throws -> NewOutput
-    ) -> One<NewOutput> {
-        let transform = transform
-        return .init(selector) { e in
-            let output = try transform(e)
-            return try f(output)
-        }
-    }
-
     public func parse(from element: any Element) throws -> Output {
         let e: any Element = try element.query(selector: selector)
         return try transform(e)
