@@ -112,7 +112,7 @@ For example, you can use SwiftSoup as the html parser, example for conformance t
 ```swift
 dependencies: [
     // ...
-    .package(url: "https://github.com/scinfu/SwiftSoup.git", .upToNextMajor(from: "2.7.7")),
+    .package(url: "https://github.com/scinfu/SwiftSoup.git", .upToNextMajor(from: "2.8.0")),
     .package(url: "https://github.com/danny1113/html-parser-builder.git", from: "3.0.0"),
 ],
 targets: [

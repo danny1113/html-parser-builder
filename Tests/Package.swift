@@ -21,7 +21,7 @@ let package = Package(
         .package(path: "../"),
         .package(
             url: "https://github.com/scinfu/SwiftSoup.git",
-            .upToNextMajor(from: "2.7.7")),
+            .upToNextMajor(from: "2.8.0")),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
