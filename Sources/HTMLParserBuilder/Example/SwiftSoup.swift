@@ -2,7 +2,7 @@
 //  SwiftSoup.swift
 //  HTMLParserBuilder
 //
-//  Created by Danny on 2025/2/15.
+//  Created by Danny Pang on 2025/2/15.
 //
 
 import Foundation
@@ -26,21 +26,6 @@ struct SoupDoc: HTMLParserBuilder.Document {
             return nil
         }
         return SoupElem(elem: elem)
-    }
-
-    func query(selector: String) -> SoupElem? {
-        guard let elem = try? doc.select(selector).first() else {
-            return nil
-        }
-        return SoupElem(elem: elem)
-    }
-
-    func queryAll(selector: String) -> [SoupElem] {
-        guard let elements = try? doc.select(selector) else {
-            return []
-        }
-
-        return elements.map(SoupElem.init)
     }
 }
 
