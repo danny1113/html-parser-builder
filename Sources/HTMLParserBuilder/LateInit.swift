@@ -9,7 +9,7 @@
 @frozen
 public struct LateInit<DataType> {
 
-    public typealias InitClosure = () -> DataType
+    public typealias InitClosure = @Sendable () -> DataType
 
     private var initClosure: InitClosure!
     private var _data: DataType!
@@ -33,3 +33,5 @@ public struct LateInit<DataType> {
         }
     }
 }
+
+extension LateInit: Sendable where DataType: Sendable {}
