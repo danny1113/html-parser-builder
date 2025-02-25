@@ -61,8 +61,11 @@ public struct Group<Output>: Sendable, HTMLComponent {
     public consuming func map<NewOutput>(
         _ f: @Sendable @escaping (Output) throws -> NewOutput
     ) -> Group<NewOutput> {
+        #if swift(<5.10)
+        let `self` = self
+        #endif
         let parse = self._parse
-        return .init(selector: selector) { e in
+        return .init(selector: self.selector) { e in
             let output = try parse(e)
             return try f(output)
         }
