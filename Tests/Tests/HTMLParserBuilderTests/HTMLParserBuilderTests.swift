@@ -28,7 +28,7 @@ struct HTMLParserBuilderTests {
 
     @Test
     func testParser() throws {
-        let capture = HTML {
+        let capture: HTML<(String, String, String, [Pair], Pair)> = HTML {
             One("h1", transform: \.textContent)
             One("#hello", transform: \.textContent)
             One("h1:nth-child(2)", transform: \.textContent)
@@ -58,7 +58,7 @@ struct HTMLParserBuilderTests {
 
     @Test
     func testEmptyCapture() throws {
-        let capture = HTML {}
+        let capture: HTML<Void> = HTML {}
 
         #expect(type(of: capture) == HTML<Void>.self)
         #expect(type(of: try doc.parse(capture)) == Void.self)
@@ -66,7 +66,7 @@ struct HTMLParserBuilderTests {
 
     @Test
     func testSingleCapture() throws {
-        let capture = HTML {
+        let capture: HTML<String> = HTML {
             One("#hello", transform: \.textContent)
         }
 
@@ -77,7 +77,7 @@ struct HTMLParserBuilderTests {
 
     @Test
     func testDecodeFailure() throws {
-        let capture = HTML {
+        let capture: HTML<(any Element, Pair, String)> = HTML {
             One("#hello")
             One("div", transform: Pair.init)
             // fail
@@ -97,7 +97,7 @@ struct HTMLParserBuilderTests {
 
     @Test
     func testDecodeWithZeroOrOne() throws {
-        let capture = HTML {
+        let capture: HTML<(any Element, Pair, String?)> = HTML {
             One("#hello")
             One("div", transform: Pair.init)
             // returns nil
@@ -127,7 +127,8 @@ struct HTMLParserBuilderTests {
 
     @Test
     func testTypeConstruction() throws {
-        let capture = HTML {
+        // capture 1
+        let capture1: HTML<((String, Int), (String, i: Int))> = HTML {
             One("h1") { e -> (String, Int) in
                 return (e.textContent, 1)
             }
@@ -135,13 +136,12 @@ struct HTMLParserBuilderTests {
                 return (e.textContent, 2)
             }
         }
-        #expect(
-            type(of: capture) == HTML<((String, Int), (String, i: Int))>.self)
 
-        let output = try doc.parse(capture)
-        #expect(type(of: output) == ((String, Int), (String, i: Int)).self)
+        let output1 = try doc.parse(capture1)
+        #expect(type(of: output1) == ((String, Int), (String, i: Int)).self)
 
-        let capture2 = HTML {
+        // capture 2
+        let capture2: HTML<(String, (String, String))> = HTML {
             One("h1", transform: \.textContent)
             Group("#group") {
                 One("h1", transform: \.textContent)
@@ -152,7 +152,8 @@ struct HTMLParserBuilderTests {
         let output2 = try doc.parse(capture2)
         #expect(type(of: output2) == (String, (String, String)).self)
 
-        let capture3 = HTML {
+        // capture 3
+        let capture3: HTML<(String, String)> = HTML {
             Group("#group") {
                 One("h1", transform: \.textContent)
                 One("h2", transform: \.textContent)
@@ -162,7 +163,8 @@ struct HTMLParserBuilderTests {
         let output3 = try doc.parse(capture3)
         #expect(type(of: output3) == (String, String).self)
 
-        let capture4 = HTML {
+        // capture 4
+        let capture4: HTML<(String, String, Pair)> = HTML {
             Group("#group") {
                 One("h1", transform: \.textContent)
                 One("h2", transform: \.textContent)
@@ -233,7 +235,7 @@ struct Pair: Equatable {
     }
 
     init(from document: any Element) throws {
-        let capture = HTML {
+        let capture: HTML<(String, String)> = HTML {
             One("h1", transform: \.textContent)
             One("h2", transform: \.textContent)
         }
@@ -263,7 +265,7 @@ func testGroupTransform() throws {
         <h1 class="c1">HELLO, class 6</h1>
         """#
 
-    let pairCapture = HTML {
+    let pairCapture: HTML<(String, String)> = HTML {
         One("h1", transform: \.textContent)
         One("h2", transform: \.textContent)
     }
@@ -277,7 +279,7 @@ func testGroupTransform() throws {
         return output.map(Pair.init)
     }
 
-    let capture = HTML {
+    let capture: HTML<(String, String, [Pair])> = HTML {
         One("h1", transform: \.textContent)
         One("#hello", transform: \.textContent)
 
