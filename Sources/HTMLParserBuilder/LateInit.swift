@@ -5,6 +5,22 @@
 //  Created by Danny Pang on 2022/7/13.
 //
 
+/// Delay the initialization until the first time you access it.
+///
+/// Here is an example of using `LateInit`:
+///
+/// ```swift
+/// struct Container {
+///     @LateInit var capture = HTML {
+///         One("h1", transform: \.textContent)
+///     }
+/// }
+///
+/// // it needs to be `var` to perform late initialization
+/// var container = Container()
+/// let output = doc.parse(container.capture)
+/// // ...
+/// ```
 @propertyWrapper
 @frozen
 public struct LateInit<DataType> {

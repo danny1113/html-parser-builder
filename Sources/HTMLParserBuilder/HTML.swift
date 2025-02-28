@@ -9,6 +9,13 @@
 ///
 /// The example below shows how to build a html parser:
 ///
+/// ```html
+/// <div id="group">
+///     <h1>hi</h1>
+///     <h2>there</h2>
+/// </div>
+/// ```
+///
 /// ```swift
 /// let capture: HTML<(String?, (String, String))> = HTML {
 ///     ZeroOrOne("#hello") { (element: any Element?) -> String? in
@@ -25,10 +32,11 @@
 /// let doc: any Document = HTMLDocument(string: htmlString)
 ///
 /// let output: (String?, (String, String)) = try doc.parse(capture)
+/// // output: (nil, "hi", "there")
 /// ```
 ///
 /// For more information about other building blocks to build a html parser,
-/// see ``One``, ``ZeroOrOne``, ``Group``.
+/// see ``One``, ``ZeroOrOne``, ``Group``, ``Many``.
 @frozen
 public struct HTML<Output>: Sendable, HTMLComponent {
 
@@ -55,6 +63,23 @@ public struct HTML<Output>: Sendable, HTMLComponent {
         }
     }
 
+    /// Transform to a new output type with the given closure
+    ///
+    /// The example below transform output to a custom type `Pair`:
+    ///
+    /// ```swift
+    /// struct Pair {
+    ///     let h1, h2: String
+    /// }
+    ///
+    /// let capture: HTML<Pair> = HTML {
+    ///     One("h1", transform: \.textContent)
+    ///     One("h2", transform: \.textContent)
+    /// }
+    /// .map { output -> Pair in
+    ///     Pair(h1: output.1, h2: output.2)
+    /// }
+    /// ```
     public consuming func map<NewOutput>(
         _ transform: @Sendable @escaping (Output) throws -> NewOutput
     ) -> HTML<NewOutput> {

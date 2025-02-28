@@ -8,27 +8,18 @@
 /// A local scope that find the first element that matches the CSS selector first,
 /// than find all the elements inside based on the local scope.
 ///
-/// The example below captures the first element with the "h1" tag inside the element with the id "group":
+/// The example below captures the first element with the "h1" tag
+/// inside the element with the id "group":
 ///
-/// ```swift
-/// Group("#group") {
-///     One("h1", transform: \.textContent)
-/// }
+/// ```html
+/// <div id="group">
+///     <h1>Find me</h1>
+/// </div>
 /// ```
 ///
-/// The example below shows how to transform to another output type:
-///
 /// ```swift
-/// struct Pair {
-///     let h1, h2: String
-/// }
-///
 /// Group("#group") {
 ///     One("h1", transform: \.textContent)
-///     One("h2", transform: \.textContent)
-/// }
-/// .map { output -> Pair in
-///     Pair(h1: output.1, h2: output.2)
 /// }
 /// ```
 @frozen
@@ -58,6 +49,23 @@ public struct Group<Output>: Sendable, HTMLComponent {
         }
     }
 
+    /// Transform to a new output type with the given closure
+    ///
+    /// The example below transform output to a custom type `Pair`:
+    ///
+    /// ```swift
+    /// struct Pair {
+    ///     let h1, h2: String
+    /// }
+    ///
+    /// Group("#group") {
+    ///     One("h1", transform: \.textContent)
+    ///     One("h2", transform: \.textContent)
+    /// }
+    /// .map { output -> Pair in
+    ///     Pair(h1: output.1, h2: output.2)
+    /// }
+    /// ```
     public consuming func map<NewOutput>(
         _ transform: @Sendable @escaping (Output) throws -> NewOutput
     ) -> Group<NewOutput> {

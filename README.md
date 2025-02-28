@@ -99,8 +99,6 @@ let output = try doc.parse(capture)
 // output: (Optional("hello, world"), ("INSIDE GROUP h1", "INSIDE GROUP h2"))
 ```
 
-> **Note**: You can now compose up to 10 components inside the builder, but you can group your captures inside [`Group`](#group) as a workaround.
-
 ## Usage
 
 ### Bring your own parser
