@@ -56,12 +56,12 @@ public struct HTML<Output>: Sendable, HTMLComponent {
     }
 
     public consuming func map<NewOutput>(
-        _ f: @Sendable @escaping (Output) throws -> NewOutput
+        _ transform: @Sendable @escaping (Output) throws -> NewOutput
     ) -> HTML<NewOutput> {
         let parse = self._parse
         return .init { e in
             let output = try parse(e)
-            return try f(output)
+            return try transform(output)
         }
     }
 
