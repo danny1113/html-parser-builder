@@ -27,21 +27,6 @@ struct SoupDoc: HTMLParserBuilder.Document {
         }
         return SoupElem(elem: elem)
     }
-
-    func query(selector: String) -> SoupElem? {
-        guard let elem = try? doc.select(selector).first() else {
-            return nil
-        }
-        return SoupElem(elem: elem)
-    }
-
-    func queryAll(selector: String) -> [SoupElem] {
-        guard let elements = try? doc.select(selector) else {
-            return []
-        }
-
-        return elements.map(SoupElem.init)
-    }
 }
 
 struct SoupElem: HTMLParserBuilder.Element {

@@ -126,9 +126,8 @@ struct HTMLParserBuilderTests {
     }
 
     @Test
-    func testTypeConstruction() throws {
-        // capture 1
-        let capture1: HTML<((String, Int), (String, i: Int))> = HTML {
+    func testTwoCaptures() throws {
+        let capture: HTML<((String, Int), (String, i: Int))> = HTML {
             One("h1") { e -> (String, Int) in
                 return (e.textContent, 1)
             }
@@ -137,11 +136,26 @@ struct HTMLParserBuilderTests {
             }
         }
 
-        let output1 = try doc.parse(capture1)
-        #expect(type(of: output1) == ((String, Int), (String, i: Int)).self)
+        let output = try doc.parse(capture)
+        #expect(type(of: output) == ((String, Int), (String, i: Int)).self)
+    }
 
-        // capture 2
-        let capture2: HTML<(String, (String, String))> = HTML {
+    @Test
+    func testGroupWithTwoCaptures() throws {
+        let capture: HTML<(String, String)> = HTML {
+            Group("#group") {
+                One("h1", transform: \.textContent)
+                One("h2", transform: \.textContent)
+            }
+        }
+
+        let output = try doc.parse(capture)
+        #expect(type(of: output) == (String, String).self)
+    }
+
+    @Test
+    func testOneCaptureAndGroup() throws {
+        let capture: HTML<(String, (String, String))> = HTML {
             One("h1", transform: \.textContent)
             Group("#group") {
                 One("h1", transform: \.textContent)
@@ -149,22 +163,13 @@ struct HTMLParserBuilderTests {
             }
         }
 
-        let output2 = try doc.parse(capture2)
-        #expect(type(of: output2) == (String, (String, String)).self)
+        let output = try doc.parse(capture)
+        #expect(type(of: output) == (String, (String, String)).self)
+    }
 
-        // capture 3
-        let capture3: HTML<(String, String)> = HTML {
-            Group("#group") {
-                One("h1", transform: \.textContent)
-                One("h2", transform: \.textContent)
-            }
-        }
-
-        let output3 = try doc.parse(capture3)
-        #expect(type(of: output3) == (String, String).self)
-
-        // capture 4
-        let capture4: HTML<(String, String, Pair)> = HTML {
+    @Test
+    func testGroupInsideGroup() throws {
+        let capture: HTML<(String, String, Pair)> = HTML {
             Group("#group") {
                 One("h1", transform: \.textContent)
                 One("h2", transform: \.textContent)
@@ -176,52 +181,38 @@ struct HTMLParserBuilderTests {
             }
         }
 
-        let output4 = try doc.parse(capture4)
-        #expect(type(of: output4) == (String, String, Pair).self)
+        let output = try doc.parse(capture)
+        #expect(type(of: output) == (String, String, Pair).self)
         #expect(
-            output4 == (
+            output == (
                 "Inside group h1", "Inside group h2",
                 Pair(("Inside group2 h1", "Inside group2 h2"))
             ))
     }
 
     @Test
-    func testLateInit() throws {
-        struct Container {
-            @LateInit var string: String? = nil
-            @LateInit var test: String! = "test"
+    func testOneCaptureAndGroupInsideGroup() throws {
+        let capture: HTML<(String, (String, String, Pair))> = HTML {
+            One("h1#hello", transform: \.textContent)
+            Group("#group") {
+                One("h1", transform: \.textContent)
+                One("h2", transform: \.textContent)
+                Group("#group2") {
+                    One("h1", transform: \.textContent)
+                    One("h2", transform: \.textContent)
+                }
+                .map(Pair.init)
+            }
         }
 
-        var container = Container()
-        #expect(container.string == nil)
-
-        container.string = "hello"
-        #expect(container.string == "hello")
-
-        container.string = nil
-        #expect(container.string == nil)
-
-        #expect(container.test == "test")
-
-        container.test = nil
-        #expect(container.test == nil)
-    }
-
-    @Test
-    func testLateInitWithClass() throws {
-        final class InnerContainer {
-            @LateInit var string: String? = nil
-            @LateInit var test: String! = "test"
-        }
-
-        struct Container {
-            @LateInit var container = InnerContainer()
-        }
-
-        var container = Container()
-        #expect(container.container.string == nil)
-        #expect(container.container.test == "test")
-
+        let output = try doc.parse(capture)
+        #expect(type(of: output) == (String, (String, String, Pair)).self)
+        #expect(output.0 == "HELLO, WORLD")
+        #expect(
+            output.1 == (
+                "Inside group h1", "Inside group h2",
+                Pair(("Inside group2 h1", "Inside group2 h2"))
+            ))
     }
 }
 
@@ -296,4 +287,42 @@ func testGroupTransform() throws {
             Pair(("HELLO, class 1", "HELLO, class 2")),
             Pair(("HELLO, class 3", "HELLO, class 4")),
         ])
+}
+
+@Test
+func testLateInit() throws {
+    struct Container {
+        @LateInit var string: String? = nil
+        @LateInit var test: String! = "test"
+    }
+
+    var container = Container()
+    #expect(container.string == nil)
+
+    container.string = "hello"
+    #expect(container.string == "hello")
+
+    container.string = nil
+    #expect(container.string == nil)
+
+    #expect(container.test == "test")
+
+    container.test = nil
+    #expect(container.test == nil)
+}
+
+@Test
+func testLateInitWithClass() throws {
+    final class InnerContainer {
+        @LateInit var string: String? = nil
+        @LateInit var test: String! = "test"
+    }
+
+    struct Container {
+        @LateInit var container = InnerContainer()
+    }
+
+    var container = Container()
+    #expect(container.container.string == nil)
+    #expect(container.container.test == "test")
 }
