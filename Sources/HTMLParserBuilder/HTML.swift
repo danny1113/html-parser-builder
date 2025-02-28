@@ -40,14 +40,11 @@ public struct HTML<Output>: Sendable, HTMLComponent {
         self._parse = parse
     }
 
-    public init<Component: HTMLComponent>(
+    public init(
         @HTMLComponentBuilder
-        component: () -> Component
-    ) where Output == Component.Output {
-        let component = component()
-        self._parse = { e in
-            return try component.parse(from: e)
-        }
+        component: () -> HTML<Output>
+    ) {
+        self = component()
     }
 
     init<each Component: HTMLComponent>(
