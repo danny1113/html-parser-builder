@@ -22,10 +22,10 @@ lint:
 		.
 
 clean:
-	-rm -rf .build
-	-rm -rf Tests/.build
+	-rm -rf .build Tests/.build .docc-build
 
 
+DOCC_PORT := 8080
 SGFS_DIR = .build/docs
 UNAME_OS := $(shell uname -s)
 ifeq ($(UNAME_OS),Darwin)
@@ -41,4 +41,5 @@ preview-docs:
 		-Xswiftc -emit-symbol-graph-dir \
 		-Xswiftc $(SGFS_DIR)
 	$(DOCC_BIN) preview \
+		--port $(DOCC_PORT) \
 		--additional-symbol-graph-dir $(SGFS_DIR)
