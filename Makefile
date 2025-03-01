@@ -1,4 +1,4 @@
-.PHONY: build test format lint
+.PHONY: build test format lint preview-docs
 
 all: build
 
@@ -24,3 +24,21 @@ lint:
 clean:
 	-rm -rf .build
 	-rm -rf Tests/.build
+
+
+SGFS_DIR = .build/docs
+UNAME_OS := $(shell uname -s)
+ifeq ($(UNAME_OS),Darwin)
+    DOCC_BIN := xcrun docc
+else
+    DOCC_BIN := docc
+endif
+
+preview-docs:
+	swift build \
+		--target HTMLParserBuilder \
+		-Xswiftc -emit-symbol-graph \
+		-Xswiftc -emit-symbol-graph-dir \
+		-Xswiftc $(SGFS_DIR)
+	$(DOCC_BIN) preview \
+		--additional-symbol-graph-dir $(SGFS_DIR)
