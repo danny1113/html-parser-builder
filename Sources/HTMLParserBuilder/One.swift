@@ -41,8 +41,8 @@ public struct One<Output>: Sendable, HTMLComponent {
         self.transform = transform
     }
 
-    public func parse(from element: any Element) throws -> Output {
-        let e: any Element = try element.query(selector: selector)
+    public func parse(from element: some Element) throws -> Output {
+        let e = try element.query(selector: selector)
         return try transform(e)
     }
 }

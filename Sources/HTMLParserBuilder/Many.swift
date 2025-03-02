@@ -57,7 +57,7 @@ public struct Many<Output>: Sendable, HTMLComponent {
         self.transform = transform
     }
 
-    public func parse(from element: any Element) throws -> Output {
+    public func parse(from element: some Element) throws -> Output {
         let e = element.queryAll(selector: selector)
         return try transform(e)
     }

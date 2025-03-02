@@ -11,5 +11,5 @@ public protocol HTMLComponent<Output>: Sendable {
     /// A type that represents the output type of ``parse(from:)``
     associatedtype Output
 
-    func parse(from element: any Element) throws -> Output
+    func parse(from element: some Element) throws -> Output
 }

@@ -90,7 +90,7 @@ public struct HTML<Output>: Sendable, HTMLComponent {
         }
     }
 
-    public func parse(from element: any Element) throws -> Output {
+    public func parse(from element: some Element) throws -> Output {
         try _parse(element)
     }
 }
