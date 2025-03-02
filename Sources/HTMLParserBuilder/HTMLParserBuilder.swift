@@ -28,12 +28,27 @@ public protocol Element {
 
     func hasAttribute(_ attribute: String) -> Bool
 
+    /// Get the attribute with key.
     subscript(_ key: String) -> String? { get }
 
     /// Same as `querySelector`.
+    ///
+    /// Using this is the same as using `querySelector`,
+    /// you pass the selector you want to query,
+    /// it retuns the first element that match the selector.
+    ///
+    /// - Parameter selector: the selector you want to query.
+    /// - Returns: The first element that match the selector.
     func query(selector: String) throws -> Self
 
     /// Same as `querySelectorAll`.
+    ///
+    /// Using this is the same as using `querySelectorAll`,
+    /// you pass the selector you want to query,
+    /// it returns all the elements that match the selector.
+    ///
+    /// - Parameter selector: the selector you want to query.
+    ///- Returns: All the elements that match the selector.
     func queryAll(selector: String) -> [Self]
 }
 
