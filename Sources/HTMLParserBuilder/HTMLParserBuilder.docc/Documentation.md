@@ -50,7 +50,7 @@ HTMLParserBuilder comes with some really great advantages:
 You can construct your parser which reflect your original HTML structure:
 
 ```swift
-let capture = HTML {
+let parser = HTML {
     ZeroOrOne("#hello") { (element: any Element?) -> String? in
         return element?.textContent
     } // => HTML<String?>
@@ -66,7 +66,7 @@ let capture = HTML {
 let htmlString = "<html>...</html>"
 let doc: any Document = HTMLDocument(string: htmlString)
 
-let output = try doc.parse(capture)
+let output = try doc.parse(parser)
 // => (String?, (String, String))
 // output: (Optional("hello, world"), ("INSIDE GROUP h1", "INSIDE GROUP h2"))
 ```

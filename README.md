@@ -78,7 +78,7 @@ HTMLParserBuilder comes with some really great advantages:
 You can construct your parser which reflect your original HTML structure:
 
 ```swift
-let capture = HTML {
+let parser = HTML {
     ZeroOrOne("#hello") { (element: any Element?) -> String? in
         return element?.textContent
     } // => HTML<String?>
@@ -94,7 +94,7 @@ let capture = HTML {
 let htmlString = "<html>...</html>"
 let doc: any Document = HTMLDocument(string: htmlString)
 
-let output = try doc.parse(capture)
+let output = try doc.parse(parser)
 // => (String?, (String, String))
 // output: (Optional("hello, world"), ("INSIDE GROUP h1", "INSIDE GROUP h2"))
 ```
@@ -139,7 +139,7 @@ struct Pair {
     let h2: String
 }
 
-let capture = HTML {
+let parser = HTML {
     One("#group h1", transform: \.textContent) // => HTML<String>
     One("#group h2", transform: \.textContent) // => HTML<String>
 }
@@ -254,14 +254,14 @@ This library also comes with a handy property wrapper: `LateInit`, which can del
 
 ```swift
 struct Container {
-    @LateInit var capture = HTML {
+    @LateInit var parser = HTML {
         One("h1", transform: \.textContent)
     }
 }
 
 // it needs to be `var` to perform late initialization
 var container = Container()
-let output = doc.parse(container.capture)
+let output = doc.parse(container.parser)
 // ...
 ```
 
@@ -300,7 +300,7 @@ let groupCapture = HTML {                                            // |
     )                                                                // |
 } // => HTML<Pair>                                                   // |
                                                                      // |
-let capture = HTML {                                                 // |
+let parser = HTML {                                                  // |
     ZeroOrOne("#hello") { (element: (any Element)?) -> String? in    // |
         return element?.textContent                                  // |
     } // => HTML<String?>                                            // |
@@ -313,5 +313,5 @@ let capture = HTML {                                                 // |
 let htmlString = "<html>...</html>"
 let doc: any Document = HTMLDocument(string: htmlString)
 
-let output: (String?, Pair) = try doc.parse(capture)
+let output: (String?, Pair) = try doc.parse(parser)
 ```

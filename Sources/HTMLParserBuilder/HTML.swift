@@ -17,7 +17,7 @@
 /// ```
 ///
 /// ```swift
-/// let capture: HTML<(String?, (String, String))> = HTML {
+/// let parser: HTML<(String?, (String, String))> = HTML {
 ///     ZeroOrOne("#hello") { (element: any Element?) -> String? in
 ///         return element?.textContent
 ///     } // => HTML<String?>
@@ -31,7 +31,7 @@
 /// let htmlString = "<html>...</html>"
 /// let doc: any Document = HTMLDocument(string: htmlString)
 ///
-/// let output: (String?, (String, String)) = try doc.parse(capture)
+/// let output: (String?, (String, String)) = try doc.parse(parser)
 /// // output: (nil, "hi", "there")
 /// ```
 ///
@@ -72,7 +72,7 @@ public struct HTML<Output>: Sendable, HTMLComponent {
     ///     let h1, h2: String
     /// }
     ///
-    /// let capture: HTML<Pair> = HTML {
+    /// let parser: HTML<Pair> = HTML {
     ///     One("h1", transform: \.textContent)
     ///     One("h2", transform: \.textContent)
     /// }

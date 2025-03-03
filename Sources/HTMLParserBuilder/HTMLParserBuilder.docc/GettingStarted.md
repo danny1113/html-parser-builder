@@ -46,13 +46,13 @@ There are 2 protocols that you should implement:
 Now everything is setup, you can start building your own parser.
 
 ```swift
-let capture: HTML<String> = HTML {
+let parser: HTML<String> = HTML {
     One("#hello", transform: \.textContent)
 }
 
 let html = "<html>...</html>"
 let doc = try SoupDoc(string: html)
-let output: String = try doc.parse(capture)
+let output: String = try doc.parse(parser)
 ```
 
 For more information about the basic building blocks:
