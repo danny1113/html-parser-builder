@@ -51,7 +51,7 @@ Existing HTML parsing library have these downside:
 
 ```swift
 let htmlString = "<html>...</html>"
-let doc: any Document = HTMLDocument(string: htmlString)
+let doc = HTMLDocument(string: htmlString)
 let first = doc.querySelector("#hello")?.textContent
 
 let group = doc.querySelector("#group")
@@ -92,7 +92,7 @@ let parser = HTML {
 
 
 let htmlString = "<html>...</html>"
-let doc: any Document = HTMLDocument(string: htmlString)
+let doc = HTMLDocument(string: htmlString)
 
 let output = try doc.parse(parser)
 // => (String?, (String, String))
@@ -311,7 +311,7 @@ let parser = HTML {                                                  // |
 
 
 let htmlString = "<html>...</html>"
-let doc: any Document = HTMLDocument(string: htmlString)
+let doc = HTMLDocument(string: htmlString)
 
 let output: (String?, Pair) = try doc.parse(parser)
 ```

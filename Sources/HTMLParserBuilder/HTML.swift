@@ -29,7 +29,7 @@
 /// }
 ///
 /// let htmlString = "<html>...</html>"
-/// let doc: any Document = HTMLDocument(string: htmlString)
+/// let doc = HTMLDocument(string: htmlString)
 ///
 /// let output: (String?, (String, String)) = try doc.parse(parser)
 /// // output: (nil, "hi", "there")

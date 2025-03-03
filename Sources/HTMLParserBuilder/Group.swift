@@ -44,8 +44,7 @@ public struct Group<Output>: Sendable, HTMLComponent {
         self.selector = selector
         let html = component()
         self._parse = { element in
-            let e: any Element = try element.query(selector: selector)
-            return try html.parse(from: e)
+            return try html.parse(from: element)
         }
     }
 
@@ -80,6 +79,7 @@ public struct Group<Output>: Sendable, HTMLComponent {
     }
 
     public func parse(from element: some Element) throws -> Output {
-        return try _parse(element)
+        let e = try element.query(selector: selector)
+        return try _parse(e)
     }
 }
